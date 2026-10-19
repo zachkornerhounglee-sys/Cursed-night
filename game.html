@@ -5,8 +5,9 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>Cursed Night v11 — Co-op Roguelike</title>
+<title>Cursed Night v13 — Co-op Roguelike</title>
 
 <style>
 
@@ -22,11 +23,13 @@
 
 }
 
-html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--fg);font-family:'Exo 2',sans-serif}
+html,body{width:100%;height:100%;min-height:100%;overflow:hidden;background:#000;color:var(--fg);font-family:'Exo 2',sans-serif;overscroll-behavior:none}
 
-#wrap{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;cursor:none;overflow:hidden}
+#wrap{position:relative;width:100vw;width:100dvw;height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;cursor:none;overflow:hidden;isolation:isolate;touch-action:none}
 
-canvas{display:block;image-rendering:pixelated}
+canvas{display:block;image-rendering:auto}
+#c{position:absolute;inset:0;width:100%;height:100%;z-index:0;touch-action:none}
+@media(max-width:700px){#mpCard{max-height:calc(100dvh - 16px);padding:18px 14px 14px}#mpCard .mpb{min-height:44px}#mpCard .mpC,#mpCard .mpM{min-height:42px;display:flex;align-items:center;justify-content:center;gap:6px}#mpBtns{gap:8px}#mpCode{font-size:clamp(24px,7vw,34px);letter-spacing:.2em}}
 
 /* VIGNETTE */
 
@@ -1365,7 +1368,32 @@ canvas{display:block;image-rendering:pixelated}
 
 </div>
 
-<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script>
+/* Resilient PeerJS loader: don't block the game if one CDN is unavailable. */
+window.CN_PEER_JS_READY = new Promise(function(resolve){
+  var sources = [
+    "https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js",
+    "https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"
+  ];
+  var index = 0, settled = false;
+  function next(){
+    if(settled) return;
+    if(window.Peer || window.PeerJS){ settled=true; resolve(window.Peer || window.PeerJS); return; }
+    if(index >= sources.length){ settled=true; resolve(null); return; }
+    var src = sources[index++], node = document.createElement("script"), localDone=false;
+    var timer = setTimeout(function(){ finish(false); }, 7000);
+    function finish(ok){
+      if(localDone || settled) return;
+      localDone=true; clearTimeout(timer);
+      if(ok && (window.Peer || window.PeerJS)){ settled=true; resolve(window.Peer || window.PeerJS); }
+      else { try{node.remove();}catch(_){} next(); }
+    }
+    node.src=src; node.async=true; node.onload=function(){finish(!!(window.Peer || window.PeerJS));}; node.onerror=function(){finish(false);};
+    document.head.appendChild(node);
+  }
+  next();
+});
+</script>
 <script>
 
 // ===================================================================
@@ -1417,6 +1445,12 @@ const CFG={autoShoot:false,shake:true,skipCS:true,parts:1,dmgNums:true,quality:"
 
 // Performance controller: caps transient objects, throttles HUD work and adapts particle quality.
 const PERF={maxBullets:360,maxEnemyProjectiles:240,maxXP:320,maxParts:360,maxFloats:80,maxBFParts:160,uiEvery:.10,uiT:0,fps:60,fpsAccum:0,fpsFrames:0,hidden:false,fx:1,lastQualityChange:0};
+const CN_DEVICE_LOW_POWER = (()=>{
+  try{
+    const mem=Number(navigator.deviceMemory||0), cores=Number(navigator.hardwareConcurrency||0);
+    return (mem>0&&mem<=4)||(cores>0&&cores<=4);
+  }catch(_){return false;}
+})();
 const UI={};
 const UI_IDS=["hpf","cef","xpf","hpv","cev","xpv","lvldisp","kills","timer","stagename","wfill","abadge","chantbadge","bossbar","bossfill","bossphase","comboval","combomult"];
 for(const id of UI_IDS)UI[id]=document.getElementById(id);
@@ -9096,9 +9130,16 @@ const GFX={
   grain:null,scan:null,hurt:null,filterOK:false,ready:false
 };
 CNX.meta.gfx=Object.assign({flare:true,bloom:true,grain:true,chroma:true,motes:true,scan:false,hudskin:true},CNX.meta.gfx||{});
-function gfxOpt(k){return !!CNX.meta.gfx[k];}
+function gfxOpt(k){
+  // Disable the most fill-rate-heavy overlays on lower-memory/CPU devices and
+  // while the live frame-rate controller is already under pressure.
+  if(CN_DEVICE_LOW_POWER && (k==="grain"||k==="scan"||k==="chroma"))return false;
+  if(PERF.fps<42 && (k==="bloom"||k==="grain"||k==="scan"||k==="chroma"||k==="flare"))return false;
+  return !!CNX.meta.gfx[k];
+}
 function gfxLevel(){
   let q=CFG.quality==="low"?0:CFG.quality==="ultra"?2:1;
+  if(CN_DEVICE_LOW_POWER)q=Math.min(q,1);
   if(PERF.fx===0)q=0;else if(PERF.fx===1)q=Math.min(q,1);
   return q;
 }
@@ -9576,12 +9617,18 @@ function loop(ts){
     PERF.fpsAccum+=rawDt;PERF.fpsFrames++;
     if(PERF.fpsAccum>=1){
       PERF.fps=PERF.fpsFrames/PERF.fpsAccum;PERF.fpsAccum=0;PERF.fpsFrames=0;
-      if(PERF.fps<38){FX.max.sparks=Math.min(FX.max.sparks,80);FX.max.bursts=Math.min(FX.max.bursts,16);
-      }else if(PERF.fps<46){FX.max.sparks=Math.min(FX.max.sparks,130);FX.max.bursts=Math.min(FX.max.bursts,24);}
-      if(PERF.fps<38){PERF.fx=0;CFG.parts=0;PERF.maxParts=220;PERF.maxBullets=280;PERF.maxEnemyProjectiles=180;}
-      else if(PERF.fps<46){PERF.fx=1;CFG.parts=0;PERF.maxParts=280;PERF.maxBullets=320;PERF.maxEnemyProjectiles=210;}
-      else if(PERF.fps<54){PERF.fx=1;CFG.parts=Math.min(CFG.parts,1);PERF.maxParts=340;}
-      else if(PERF.fps>58){PERF.fx=2;CFG.parts=Math.min(2,CFG.parts+1);PERF.maxParts=420;}
+      if(PERF.fps<38){FX.max.sparks=Math.min(FX.max.sparks,70);FX.max.bursts=Math.min(FX.max.bursts,14);}
+      else if(PERF.fps<46){FX.max.sparks=Math.min(FX.max.sparks,110);FX.max.bursts=Math.min(FX.max.bursts,20);}
+      if(PERF.fps<32){PERF.fx=0;CFG.parts=0;PERF.maxParts=100;PERF.maxBullets=170;PERF.maxEnemyProjectiles=110;PERF.maxFloats=28;PERF.maxBFParts=45;}
+      else if(PERF.fps<38){PERF.fx=0;CFG.parts=0;PERF.maxParts=150;PERF.maxBullets=210;PERF.maxEnemyProjectiles=140;PERF.maxFloats=35;PERF.maxBFParts=60;}
+      else if(PERF.fps<46){PERF.fx=1;CFG.parts=Math.min(CFG.parts,1);PERF.maxParts=220;PERF.maxBullets=250;PERF.maxEnemyProjectiles=160;}
+      else if(PERF.fps<54){PERF.fx=1;CFG.parts=Math.min(CFG.parts,1);PERF.maxParts=280;PERF.maxBullets=260;PERF.maxEnemyProjectiles=180;PERF.maxFloats=60;PERF.maxBFParts=100;}
+      else {
+        const base=CFG.quality==="low"?{b:180,e:120,p:110,f:35,bf:60}:CFG.quality==="ultra"?{b:360,e:240,p:360,f:80,bf:160}:{b:260,e:180,p:240,f:60,bf:100};
+        PERF.maxBullets=base.b;PERF.maxEnemyProjectiles=base.e;PERF.maxParts=base.p;PERF.maxFloats=base.f;PERF.maxBFParts=base.bf;
+        if(PERF.fps>58&&!CN_DEVICE_LOW_POWER){PERF.fx=2;CFG.parts=Math.min(2,Math.max(1,CFG.parts));}
+        else {PERF.fx=Math.min(1,Math.max(0,CFG.parts));}
+      }
     }
   }
   if(PERF.hidden){requestAnimationFrame(loop);return;}
@@ -9828,7 +9875,8 @@ const CNMP=(function(){
   .mpb:hover{border-color:#cbbfff;background:linear-gradient(135deg,rgba(91,200,255,.28),rgba(157,140,255,.32))}
   .mpb.go{background:linear-gradient(135deg,#1fae7a,#3ad6a0);border-color:#7dffd3;color:#02140d}
   .mpb.dim{opacity:.35;pointer-events:none}.mpb.bad{border-color:rgba(255,79,109,.5);background:rgba(255,79,109,.12)}
-  #mpStatus{min-height:18px;margin-top:12px;font-size:12px;text-align:center;color:#ffd04a}
+  #mpStatus{min-height:18px;margin-top:12px;font-size:12px;line-height:1.45;text-align:center;color:#ffd04a;overflow-wrap:anywhere}
+  .mpb:disabled{opacity:.48;cursor:wait;filter:saturate(.6)}
   #mpCode{font-family:'Cinzel Decorative',serif;font-size:34px;letter-spacing:.35em;text-align:center;color:#2fffb0;text-shadow:0 0 22px rgba(47,255,176,.5);margin:2px 0 2px;cursor:pointer;user-select:all}
   .mpHint{text-align:center;font-size:10px;opacity:.45;letter-spacing:.1em;margin-bottom:10px}
   #mpRoster{display:flex;flex-direction:column;gap:6px;margin:8px 0 10px}
@@ -9865,7 +9913,7 @@ const CNMP=(function(){
     <h2>CO-OP</h2><div class="sub" id="mpSub">fight the cursed night together</div>
     <div id="mpStageConn">
       <label>Your name</label><input type="text" id="mpName" maxlength="16" placeholder="Sorcerer" autocomplete="off">
-      <input type="text" id="mpServer" autocomplete="off" spellcheck="false" value="" aria-hidden="true" tabindex="-1" style="display:none"><div class="mpHint" style="margin:4px 0 12px">Create a room, then click its code to copy one invite link. Keep the host tab open while friends play.</div>
+      <input type="text" id="mpServer" autocomplete="off" spellcheck="false" value="" aria-hidden="true" tabindex="-1" style="display:none"><div class="mpHint" style="margin:4px 0 12px">Create a room, then click its code to copy one invite link. Keep the host tab open and visible while friends play.</div>
       <label>Room code (to join a friend)</label><input type="text" id="mpRoomIn" maxlength="6" placeholder="ABCD" autocomplete="off" style="text-transform:uppercase;letter-spacing:.3em">
       <div id="mpBtns"><button class="mpb go" id="mpCreate">Create room</button><button class="mpb" id="mpJoin">Join room</button></div>
       <div id="mpBtns2" style="display:flex;margin-top:10px"><button class="mpb bad" id="mpBack1" style="flex:1">Back</button></div>
@@ -9891,6 +9939,9 @@ const CNMP=(function(){
   let toastTO=0;
   function toast(t,ms=3200){toastEl.textContent=t;toastEl.style.display="block";clearTimeout(toastTO);toastTO=setTimeout(()=>toastEl.style.display="none",ms);}
   function status(t){$("mpStatus").textContent=t||"";}
+  function setJoinBusy(busy){
+    for(const id of ["mpCreate","mpJoin"]){const el=$(id);if(!el)continue;el.disabled=!!busy;el.classList.toggle("dim",!!busy);}
+  }
   function chatLine(name,text,col,sys){
     const d=document.createElement("div");
     d.innerHTML=sys?`<span style="opacity:.7">${esc(text)}</span>`:`<b style="color:${esc(col||"#fff")}">${esc(name)}</b> ${esc(text)}`;
@@ -9994,58 +10045,114 @@ const CNMP=(function(){
     try{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("room",S.room);u.searchParams.set("cnpeer",hostId);return u.toString();}catch(_){return location.href;}
   }
   function defaultServer(){return "";}
-  function connect(then,create,roomCode){
-    const PeerCtor=peerLibrary();if(!PeerCtor){status("Could not load the multiplayer connector. Refresh the page and try again.");return;}
+  async function connect(then,create,roomCode){
+    // Wait for either CDN copy of PeerJS, but never hang forever.
+    let PeerCtor=peerLibrary();
+    if(!PeerCtor && window.CN_PEER_JS_READY){
+      status("Loading multiplayer connector…");
+      try{
+        PeerCtor=await Promise.race([
+          window.CN_PEER_JS_READY,
+          new Promise(resolve=>setTimeout(()=>resolve(null),15000))
+        ]);
+      }catch(_){PeerCtor=null;}
+      PeerCtor=PeerCtor||peerLibrary();
+    }
+    if(!PeerCtor){setJoinBusy(false);status("Could not load multiplayer. Refresh the page or try a different network; both connector CDNs failed.");return;}
     if(S.ws){try{S.ws.onclose=null;S.ws.close();}catch(_){}}
     const invitePeer=getInvitePeer();
-    if(!create&&!invitePeer){status("Open your friend's invite link to join their room.");return;}
-    status(create?"Opening a shareable room…":"Connecting to your friend's room…");
-    let peer;try{peer=new PeerCtor();}catch(e){status("Could not start peer connection. Refresh and try again.");return;}
+    if(!create&&!invitePeer){setJoinBusy(false);status("Open your friend's invite link to join their room.");return;}
+    status(create?"Contacting multiplayer service…":"Contacting multiplayer service…");
+    let peer;
+    try{
+      // Explicit secure signalling + TURN fallback for networks where STUN alone fails.
+      peer=new PeerCtor(undefined,{
+        host:"0.peerjs.com",port:443,path:"/",secure:true,debug:0,
+        config:{iceServers:[
+          {urls:"stun:stun.l.google.com:19302"},
+          {urls:"turn:eu-0.turn.peerjs.com:3478",username:"peerjs",credential:"peerjsp"},
+          {urls:"turn:us-0.turn.peerjs.com:3478",username:"peerjs",credential:"peerjsp"}
+        ],sdpSemantics:"unified-plan"}
+      });
+    }catch(e){setJoinBusy(false);status("Your browser could not start WebRTC. Try an up-to-date Chrome, Edge, Firefox or Safari browser.");return;}
     if(create)cnHostPeer=peer;else cnClientPeer=peer;
-    let opened=false,connecting=false,local=create;
+    let opened=false,peerReady=false,connecting=false,local=!!create,failed=false;
+    let peerTimer=0,dataTimer=0;
+    const clearTimers=()=>{clearTimeout(peerTimer);clearTimeout(dataTimer);peerTimer=0;dataTimer=0;};
     const ws={readyState:0,onopen:null,onmessage:null,onerror:null,onclose:null,conn:null,local,
       send(raw){if(this.readyState!==1)return;if(this.local)relayServerMessage(this,raw);else if(this.conn&&this.conn.open){try{this.conn.send(raw);}catch(e){}}},
-      close(){if(this.readyState===3)return;this.readyState=3;if(this.local){dropRelaySocket(this);if(cnHostPeer){const p=cnHostPeer;cnHostPeer=null;try{p.destroy();}catch(_){}}}else{try{if(this.conn)this.conn.close();}catch(_){}if(cnClientPeer){const p=cnClientPeer;cnClientPeer=null;try{p.destroy();}catch(_){}}}if(this.onclose)this.onclose();}
+      close(){if(this.readyState===3)return;clearTimers();this.readyState=3;if(this.local){dropRelaySocket(this);if(cnHostPeer){const p=cnHostPeer;cnHostPeer=null;try{p.destroy();}catch(_){}}}else{try{if(this.conn)this.conn.close();}catch(_){}if(cnClientPeer){const p=cnClientPeer;cnClientPeer=null;try{p.destroy();}catch(_){}}}if(this.onclose)this.onclose();}
     };
     S.ws=ws;
-    ws.onopen=()=>{opened=true;S.conn=true;then&&then();};
+    function failBeforeOpen(message){
+      if(failed||opened||S.ws!==ws)return;
+      failed=true;clearTimers();
+      setJoinBusy(false);status(message);S.conn=false;ws.readyState=3;
+      if(S.ws===ws)S.ws=null;
+      if(cnHostPeer===peer)cnHostPeer=null;
+      if(cnClientPeer===peer)cnClientPeer=null;
+      try{peer.destroy();}catch(_){}
+    }
+    function errorText(err){
+      const type=err&&err.type||"";
+      if(type==="peer-unavailable")return "The host couldn't be reached. Make sure their room is still open, then ask them to create a fresh invite link.";
+      if(type==="browser-incompatible")return "This browser doesn't support the WebRTC features Cursed Night needs. Try an up-to-date Chrome, Edge, Firefox or Safari.";
+      if(["network","socket-error","socket-closed","server-error"].includes(type))return "The multiplayer signalling service could not be reached. Check Wi-Fi, VPN/content blockers, or try another network.";
+      if(type==="webrtc")return "Your network blocked the direct player connection. Try another network; some school, work and mobile networks restrict peer-to-peer traffic.";
+      return "Multiplayer couldn't connect ("+(type||"network error")+"). Check your connection and try again.";
+    }
+    ws.onopen=()=>{opened=true;clearTimers();S.conn=true;status("");then&&then();};
     ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(_){return;}onMsg(m);};
     ws.onerror=()=>{};
     ws.onclose=()=>{
-      const was=S.conn;S.conn=false;if(S.ws!==ws)return;
-      if(!opened){status("Could not connect. Make sure the host has the game open and try again.");return;}
+      clearTimers();const was=S.conn;S.conn=false;if(S.ws!==ws)return;
+      if(!opened){setJoinBusy(false);status("Connection closed before the room opened. Check your network and retry.");return;}
       if(S.inRun){S.active=false;clearAllies();hideTeam();toast("Disconnected from the host — continuing solo",5000);if(S.down||S.dead)reviveSelf(.5);}
       else if(was&&!S.wantLeave){showStage("conn");status("Disconnected from the room. Ask the host to create a new invite if it closed.");}
     };
+    // Phase 1: PeerJS assigns an ID via its signalling server.
+    peerTimer=setTimeout(()=>{
+      if(!peerReady)failBeforeOpen("Still couldn't reach the multiplayer service after 15 seconds. Check your connection/VPN or try another network, then retry.");
+    },15000);
     peer.on("open",()=>{
-      if(S.ws!==ws)return;
+      if(S.ws!==ws||failed)return;
+      peerReady=true;clearTimeout(peerTimer);peerTimer=0;
       if(create){
         cnRelayRoom=null;cnHostRoomCode=roomCode||makeRoomCode();
         peer.on("connection",conn=>{if(cnHostPeer!==peer){try{conn.close();}catch(_){}return;}attachRemoteHostSocket(conn);});
-        /* Keep the local transport socket room unset until its own join message is processed. */ws.readyState=1;if(ws.onopen)ws.onopen();
+        // The local host uses the same protocol as remote players without a server.
+        ws.readyState=1;if(ws.onopen)ws.onopen();
       }else{
         if(connecting)return;connecting=true;
-        let conn;try{conn=peer.connect(invitePeer,{reliable:true});}catch(e){status("Could not reach the host. Ask them to recreate the invite link.");return;}
+        let conn;try{conn=peer.connect(invitePeer,{reliable:true,serialization:"json"});}
+        catch(e){failBeforeOpen("Couldn't start a connection to the host. Ask them to recreate the invite link.");return;}
         ws.conn=conn;
-        conn.on("open",()=>{if(S.ws!==ws)return;ws.readyState=1;if(ws.onopen)ws.onopen();});
+        dataTimer=setTimeout(()=>{
+          if(!opened)failBeforeOpen("The invite link was found, but the host didn't answer. Make sure the host keeps Cursed Night open and create a fresh invite link.");
+        },18000);
+        conn.on("open",()=>{if(S.ws!==ws||failed)return;clearTimeout(dataTimer);dataTimer=0;ws.readyState=1;if(ws.onopen)ws.onopen();});
         conn.on("data",data=>{if(S.ws!==ws||!ws.onmessage)return;ws.onmessage({data:typeof data==="string"?data:JSON.stringify(data)});});
         conn.on("close",()=>{if(ws.readyState===3)return;ws.readyState=3;if(ws.onclose)ws.onclose();});
-        conn.on("error",()=>{status("Connection to the host failed. Check that their tab is still open.");});
+        conn.on("error",err=>{if(!opened)failBeforeOpen(errorText(err));else status("The connection was interrupted. Ask the host to create a fresh invite if it doesn't recover.");});
       }
     });
     peer.on("error",err=>{
       if(S.ws!==ws)return;
-      const type=err&&err.type||"";
-      if(!opened){
-        if(type==="peer-unavailable")status("The host is offline. Ask them to open the game and create a fresh room.");
-        else status("Multiplayer connection failed ("+(type||"network error")+"). Refresh and try again.");
-      }else if(type==="network"||type==="socket-error"||type==="server-error")status("The free signalling service is temporarily unreachable. Try again shortly.");
+      if(!opened)failBeforeOpen(errorText(err));
+      else if(["network","socket-error","socket-closed","server-error"].includes(err&&err.type))status("The signalling service disconnected. Existing room traffic may stop; reconnect if needed.");
+    });
+    peer.on("disconnected",()=>{
+      // PeerJS can reconnect to its broker without killing an already-open WebRTC link.
+      if(S.ws===ws&&opened)status("Signalling service reconnected; keeping the current player link if it is still active…");
+    });
+    peer.on("close",()=>{
+      if(S.ws===ws&&!opened&&!failed)failBeforeOpen("The multiplayer connection closed before it was ready. Please try again.");
     });
   }
   function onMsg(m){
     switch(m.t){
       case "joined":
-        S.id=m.id;S.room=m.room;setRoster(m);showStage("room");status("");
+        setJoinBusy(false);S.id=m.id;S.room=m.room;setRoster(m);showStage("room");status("");
         SS("cn_mp_auto",JSON.stringify({room:m.room,name:S.name,peer:getInvitePeer()}));
         if(getInvitePeer())history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname+"?room="+m.room+"&cnpeer="+encodeURIComponent(getInvitePeer()));
         break;
@@ -10063,7 +10170,7 @@ const CNMP=(function(){
       case "chat":{const r=S.roster.find(x=>x.id===m.f);chatLine(m.n,m.m,r?chCol(r.char):"#fff");break;}
       case "sys":if(S.inRun&&m.m)chatLine("",m.m,null,true);break;
       case "pong":S.ping=Math.round(performance.now()-m.ts);break;
-      case "err":status(m.m||"Error");break;
+      case "err":setJoinBusy(false);status(m.m||"Error");break;
     }
   }
   function setRoster(m){
@@ -10123,6 +10230,7 @@ const CNMP=(function(){
     else if(invitedPeer)code=getQueryRoom()||code;
     if(!create&&(!invitedPeer||code.length<3)){status("Use the invite link your friend copied from their room.");return;}
     S.wantLeave=false;
+    setJoinBusy(true);
     connect(()=>{send({t:"join",name,char:CHAR,room:code,create:!!create,rejoin:false});S.rejoin=false;},!!create,code);
   }
   $("mpCreate").onclick=()=>doJoin(true);
@@ -10134,11 +10242,11 @@ const CNMP=(function(){
   $("mpCode").onclick=()=>{
     const link=inviteLink();
     if(!link){status("Invite link is not ready yet. Create a room first.");return;}
-    const done=()=>status("Invite link copied! Send it to friends and keep this tab open.");
+    const done=()=>status("Invite link copied! Send it to friends and keep this tab open and visible.");
     try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done).catch(()=>window.prompt("Copy this invite link and send it to friends:",link));else window.prompt("Copy this invite link and send it to friends:",link);}catch(_){window.prompt("Copy this invite link and send it to friends:",link);}
   };
   function leaveRoom(){
-    S.wantLeave=true;SS("cn_mp_auto",null);
+    setJoinBusy(false);S.wantLeave=true;SS("cn_mp_auto",null);
     if(S.ws){try{S.ws.onclose=null;S.ws.close();}catch(_){}}
     S.ws=null;S.conn=false;S.room=null;S.id=null;S.roster=[];S.started=false;
     if(cnClientPeer){try{cnClientPeer.destroy();}catch(_){}cnClientPeer=null;}

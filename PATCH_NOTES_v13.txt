@@ -1,0 +1,11 @@
+Cursed Night v13 — Multiplayer reliability and cross-device tuning
+
+- PeerJS loader now falls back from unpkg to jsDelivr and is bounded by a timeout.
+- Multiplayer signalling and host connection use explicit timeouts with readable diagnostics rather than remaining stuck on an opening status.
+- Error handling differentiates offline host, unavailable signalling, WebRTC/browser incompatibility, and likely network blocking.
+- Uses secure PeerJS Cloud settings and public STUN/TURN ICE configuration for improved NAT traversal.
+- Adds responsive viewport metadata, dynamic viewport-height support, full-screen canvas sizing, safe touch target sizing and readable mobile status text.
+- Low-resource devices skip expensive screen overlays; live frame-rate adaptation lowers particles/projectile budgets more aggressively under pressure.
+- index.html and game.html are synchronized. Legacy server/deployment files are retained without requiring them for link-based co-op.
+
+Limitation: Peer-to-peer multiplayer still requires the signalling service and a workable WebRTC network path. If the network blocks direct traffic, the new messages explain that rather than leaving an endless loading status.
