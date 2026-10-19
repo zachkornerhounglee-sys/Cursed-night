@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: cursed-night-relay
-    runtime: node
-    plan: free
-    buildCommand: "true"
-    startCommand: node server.js
-    healthCheckPath: /health
