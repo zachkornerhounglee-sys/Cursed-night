@@ -1,0 +1,10 @@
+{
+  "name": "cursed-night-coop",
+  "version": "11.0.0",
+  "description": "Cursed Night v11 — co-op relay server (zero dependencies)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=16" },
+  "license": "UNLICENSED",
+  "private": true
+}

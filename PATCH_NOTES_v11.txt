@@ -1,0 +1,8 @@
+CURSED NIGHT — v11
+PACKAGE / ZIP LAYOUT UPDATE
+
+- Organized the project into one clearly named top-level folder, similar to the Zach's Ultimate Buffet ZIP layout.
+- Added game.html alongside index.html as a matching standalone game entry file.
+- Kept the original index.html and co-op relay server unchanged.
+- Kept package.json and render.yaml together with the server files for Node.js / Render deployment.
+- Added README.txt with local-play and deployment guidance.
