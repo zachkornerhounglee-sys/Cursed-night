@@ -1,0 +1,10 @@
+CURSED NIGHT v12 — SHARE-LINK CO-OP
+
+- Removed the visible relay server-address requirement from the multiplayer lobby.
+- Added PeerJS Cloud/WebRTC transport for browser-only peer connections.
+- The room creator's browser relays the existing co-op messages, so friends can join through one invite URL.
+- Clicking the room code copies the GitHub Pages URL with the room code and host peer ID.
+- Opening an invite URL automatically opens multiplayer and connects to the host.
+- Fixed host socket initialization so the host's own room-join message is processed correctly.
+- The host must keep the game tab open; rooms are temporary and limited to four players.
+- Legacy server.js/package.json/render.yaml remain in the archive but are not required for this mode.

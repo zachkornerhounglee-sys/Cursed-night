@@ -1365,6 +1365,7 @@ canvas{display:block;image-rendering:pixelated}
 
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <script>
 
 // ===================================================================
@@ -9864,13 +9865,13 @@ const CNMP=(function(){
     <h2>CO-OP</h2><div class="sub" id="mpSub">fight the cursed night together</div>
     <div id="mpStageConn">
       <label>Your name</label><input type="text" id="mpName" maxlength="16" placeholder="Sorcerer" autocomplete="off">
-      <label>Server <span style="opacity:.6;text-transform:none;letter-spacing:0">(your relay — e.g. wss://my-game.onrender.com)</span></label><input type="text" id="mpServer" autocomplete="off" spellcheck="false" placeholder="wss://your-relay-host">
+      <input type="text" id="mpServer" autocomplete="off" spellcheck="false" value="" aria-hidden="true" tabindex="-1" style="display:none"><div class="mpHint" style="margin:4px 0 12px">Create a room, then click its code to copy one invite link. Keep the host tab open while friends play.</div>
       <label>Room code (to join a friend)</label><input type="text" id="mpRoomIn" maxlength="6" placeholder="ABCD" autocomplete="off" style="text-transform:uppercase;letter-spacing:.3em">
       <div id="mpBtns"><button class="mpb go" id="mpCreate">Create room</button><button class="mpb" id="mpJoin">Join room</button></div>
       <div id="mpBtns2" style="display:flex;margin-top:10px"><button class="mpb bad" id="mpBack1" style="flex:1">Back</button></div>
     </div>
     <div id="mpStageRoom" style="display:none">
-      <div class="mpHint">ROOM CODE — click to copy invite</div><div id="mpCode">----</div>
+      <div class="mpHint">INVITE LINK — click the room code to copy and send it</div><div id="mpCode">----</div>
       <div id="mpRoster"></div>
       <label>Your sorcerer</label><div id="mpChars"></div>
       <label>Mode <span id="mpModeNote" style="opacity:.6;text-transform:none;letter-spacing:0"></span></label><div id="mpModes"></div>
@@ -9898,49 +9899,155 @@ const CNMP=(function(){
   }
 
   /* --------------------------------------------------------- network */
-  const CNMP_SERVER_DEFAULT="";   // optional: hard-code your relay, e.g. "wss://cursed-night.onrender.com"
-  function defaultServer(){
-    const qs=(location.search.match(/[?&]server=([^&]+)/)||[])[1];
-    if(qs){try{const v=decodeURIComponent(qs);LS("cn_mp_server",v);return v;}catch(_){}}
-    const saved=LS("cn_mp_server");if(saved)return saved;
-    if(CNMP_SERVER_DEFAULT)return CNMP_SERVER_DEFAULT;
-    if(/\.github\.io$/i.test(location.hostname))return "";
-    if(/^https?:$/.test(location.protocol))return (location.protocol==="https:"?"wss://":"ws://")+location.host;
-    return "ws://localhost:3000";
+  // Browser-only co-op transport. PeerJS Cloud provides signalling; the room
+  // creator's browser acts as the relay. No Render/Node server is required.
+  let cnHostPeer=null, cnClientPeer=null, cnRelayRoom=null, cnHostRoomCode="";
+  const CNMP_MAX_PLAYERS=4, CNMP_CODE_CHARS="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  function getInvitePeer(){try{return new URLSearchParams(location.search).get("cnpeer")||"";}catch(_){return "";}}
+  function getQueryRoom(){try{return (new URLSearchParams(location.search).get("room")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);}catch(_){return "";}}
+  function makeRoomCode(){let c="";for(let i=0;i<4;i++)c+=CNMP_CODE_CHARS[Math.floor(Math.random()*CNMP_CODE_CHARS.length)];return c;}
+  function cleanRoomName(n){return String(n==null?"":n).replace(/[\u0000-\u001f\u007f<>]/g,"").trim().slice(0,16)||"Player";}
+  function cleanRoomCode(c){c=String(c==null?"":c).toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);return c.length>=3?c:"";}
+  function peerLibrary(){return window.Peer||window.PeerJS||null;}
+  function serverSend(sock,obj){
+    if(!sock||sock.closed)return;
+    try{
+      const raw=JSON.stringify(obj);
+      if(sock.local){if(sock.onmessage)sock.onmessage({data:raw});}
+      else if(sock.conn&&sock.conn.open)sock.conn.send(raw);
+    }catch(e){}
   }
-  function send(o){if(S.ws&&S.ws.readyState===1){try{S.ws.send(JSON.stringify(o));}catch(_){}}}
-  function relay(d,to){const m={t:"r",d};if(to!=null)m.to=to;send(m);}
-
-  function connect(then){
-    let url=($("mpServer").value||"").trim();
-    if(!url){status("Enter your relay server address first (see README → GitHub).");return;}
-    if(!/^wss?:\/\//i.test(url)){
-      if(/^https?:\/\//i.test(url))url=url.replace(/^http/i,"ws");else url="ws://"+url;
+  function roomRoster(room){const a=[];for(const c of room.clients.values())a.push({id:c.id,name:c.name,char:c.char});return a;}
+  function broadcastRoster(room){if(!room)return;const m={t:"roster",roster:roomRoster(room),host:room.host,mode:room.mode,started:room.started,max:CNMP_MAX_PLAYERS};for(const c of room.clients.values())serverSend(c,m);}
+  function announceRoom(room,from,obj){for(const c of room.clients.values())if(c!==from)serverSend(c,obj);}
+  function dropRelaySocket(sock){
+    if(!sock||sock.closed)return;sock.closed=true;
+    const room=sock.room;
+    if(!room)return;
+    room.clients.delete(sock.id);sock.room=null;
+    if(!room.clients.size){if(cnRelayRoom===room)cnRelayRoom=null;return;}
+    if(room.host===sock.id)room.host=room.clients.keys().next().value;
+    announceRoom(room,sock,{t:"sys",m:sock.name+" left",left:sock.id});
+    broadcastRoster(room);
+  }
+  function relayServerMessage(sock,raw){
+    let m;try{m=typeof raw==="string"?JSON.parse(raw):raw;}catch(_){return;}if(!m||typeof m!=="object")return;
+    switch(m.t){
+      case "ping":serverSend(sock,{t:"pong",ts:m.ts});return;
+      case "join":{
+        if(sock.room)return;
+        const wantCreate=!!m.create;let code=cleanRoomCode(m.room);let room=cnRelayRoom;
+        if(!room){
+          if(!wantCreate){serverSend(sock,{t:"err",m:"The host is offline or the invite link has expired. Ask your friend to create a new room."});return;}
+          if(!code)code=makeRoomCode();
+          room={code,clients:new Map(),host:null,mode:"normal",started:false,nextId:1};cnRelayRoom=room;cnHostRoomCode=code;
+        }else if(wantCreate){serverSend(sock,{t:"err",m:"A room is already active in this tab."});return;}
+        if(!wantCreate&&code&&code!==room.code){serverSend(sock,{t:"err",m:"That invite does not match the active room."});return;}
+        if(room.clients.size>=CNMP_MAX_PLAYERS){serverSend(sock,{t:"err",m:"Room is full (4 players maximum)."});return;}
+        sock.room=room;sock.id=String(room.nextId++);sock.name=cleanRoomName(m.name);sock.char=typeof m.char==="string"?m.char.replace(/[^a-z0-9_]/gi,"").slice(0,20)||"gojo":"gojo";sock.lastChat=0;sock.closed=false;room.clients.set(sock.id,sock);if(!room.host)room.host=sock.id;
+        serverSend(sock,{t:"joined",id:sock.id,room:room.code,host:room.host,roster:roomRoster(room),mode:room.mode,started:room.started,max:CNMP_MAX_PLAYERS});
+        broadcastRoster(room);announceRoom(room,sock,{t:"sys",m:sock.name+" joined"});return;
+      }
+      case "set":{
+        const room=sock.room;if(!room)return;
+        if(typeof m.char==="string")sock.char=m.char.replace(/[^a-z0-9_]/gi,"").slice(0,20)||sock.char;
+        if(typeof m.name==="string")sock.name=cleanRoomName(m.name);broadcastRoster(room);return;
+      }
+      case "mode":{
+        const room=sock.room;if(!room||room.host!==sock.id||room.started)return;
+        if(["normal","endless","rush"].includes(m.mode)){room.mode=m.mode;broadcastRoster(room);}return;
+      }
+      case "start":{
+        const room=sock.room;if(!room||room.host!==sock.id||room.started)return;
+        room.started=true;for(const c of room.clients.values())serverSend(c,{t:"start",mode:room.mode});broadcastRoster(room);return;
+      }
+      case "end":{const room=sock.room;if(!room||!room.started)return;room.started=false;broadcastRoster(room);return;}
+      case "chat":{
+        const room=sock.room;if(!room)return;const now=Date.now();if(now-sock.lastChat<350)return;sock.lastChat=now;
+        const msg=String(m.m==null?"":m.m).replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,140);if(!msg)return;
+        for(const c of room.clients.values())serverSend(c,{t:"chat",f:sock.id,n:sock.name,m:msg});return;
+      }
+      case "r":{
+        const room=sock.room;if(!room||!m.d||typeof m.d!=="object")return;
+        const out={t:"r",f:sock.id,d:m.d};
+        if(m.to!=null){const c=room.clients.get(String(m.to));if(c&&c!==sock)serverSend(c,out);return;}
+        for(const c of room.clients.values())if(c!==sock)serverSend(c,out);return;
+      }
     }
-    LS("cn_mp_server",url);
+  }
+  function makeLocalHostSocket(){
+    return {local:true,readyState:0,onopen:null,onmessage:null,onerror:null,onclose:null,room:null,id:null,name:"Player",char:"gojo",lastChat:0,closed:false,
+      send(raw){if(this.readyState===1&&!this.closed)relayServerMessage(this,raw);},
+      close(){if(this.readyState===3)return;this.readyState=3;dropRelaySocket(this);if(cnHostPeer){const p=cnHostPeer;cnHostPeer=null;try{p.destroy();}catch(_){}}if(this.onclose)this.onclose();}
+    };
+  }
+  function attachRemoteHostSocket(conn){
+    const sock={local:false,conn,readyState:1,room:null,id:null,name:"Player",char:"gojo",lastChat:0,closed:false,
+      sendRaw(obj){serverSend(this,obj);}};
+    conn.on("data",raw=>relayServerMessage(sock,raw));
+    conn.on("close",()=>dropRelaySocket(sock));
+    conn.on("error",()=>dropRelaySocket(sock));
+    if(cnRelayRoom&&cnRelayRoom.started)serverSend(sock,{t:"err",m:"Room is already in a run; ask the host to invite you to the next lobby."});
+  }
+  function inviteLink(){
+    const hostId=(cnHostPeer&&cnHostPeer.id)||getInvitePeer();if(!hostId||!S.room)return "";
+    try{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("room",S.room);u.searchParams.set("cnpeer",hostId);return u.toString();}catch(_){return location.href;}
+  }
+  function defaultServer(){return "";}
+  function connect(then,create,roomCode){
+    const PeerCtor=peerLibrary();if(!PeerCtor){status("Could not load the multiplayer connector. Refresh the page and try again.");return;}
     if(S.ws){try{S.ws.onclose=null;S.ws.close();}catch(_){}}
-    status("connecting to "+url+" …");
-    let ws;try{ws=new WebSocket(url);}catch(e){status("Invalid server address.");return;}
-    S.ws=ws;let opened=false;
+    const invitePeer=getInvitePeer();
+    if(!create&&!invitePeer){status("Open your friend's invite link to join their room.");return;}
+    status(create?"Opening a shareable room…":"Connecting to your friend's room…");
+    let peer;try{peer=new PeerCtor();}catch(e){status("Could not start peer connection. Refresh and try again.");return;}
+    if(create)cnHostPeer=peer;else cnClientPeer=peer;
+    let opened=false,connecting=false,local=create;
+    const ws={readyState:0,onopen:null,onmessage:null,onerror:null,onclose:null,conn:null,local,
+      send(raw){if(this.readyState!==1)return;if(this.local)relayServerMessage(this,raw);else if(this.conn&&this.conn.open){try{this.conn.send(raw);}catch(e){}}},
+      close(){if(this.readyState===3)return;this.readyState=3;if(this.local){dropRelaySocket(this);if(cnHostPeer){const p=cnHostPeer;cnHostPeer=null;try{p.destroy();}catch(_){}}}else{try{if(this.conn)this.conn.close();}catch(_){}if(cnClientPeer){const p=cnClientPeer;cnClientPeer=null;try{p.destroy();}catch(_){}}}if(this.onclose)this.onclose();}
+    };
+    S.ws=ws;
     ws.onopen=()=>{opened=true;S.conn=true;then&&then();};
     ws.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch(_){return;}onMsg(m);};
     ws.onerror=()=>{};
     ws.onclose=()=>{
-      const was=S.conn;S.conn=false;
-      if(S.ws!==ws)return;
-      if(!opened){status("Could not reach "+url+" — is the server running? (node server.js)");return;}
-      if(S.inRun){S.active=false;clearAllies();hideTeam();toast("Disconnected from the server — continuing solo",5000);
-        if(S.down||S.dead){reviveSelf(.5);} }
-      else if(was&&!S.wantLeave){showStage("conn");status("Disconnected from server.");}
+      const was=S.conn;S.conn=false;if(S.ws!==ws)return;
+      if(!opened){status("Could not connect. Make sure the host has the game open and try again.");return;}
+      if(S.inRun){S.active=false;clearAllies();hideTeam();toast("Disconnected from the host — continuing solo",5000);if(S.down||S.dead)reviveSelf(.5);}
+      else if(was&&!S.wantLeave){showStage("conn");status("Disconnected from the room. Ask the host to create a new invite if it closed.");}
     };
+    peer.on("open",()=>{
+      if(S.ws!==ws)return;
+      if(create){
+        cnRelayRoom=null;cnHostRoomCode=roomCode||makeRoomCode();
+        peer.on("connection",conn=>{if(cnHostPeer!==peer){try{conn.close();}catch(_){}return;}attachRemoteHostSocket(conn);});
+        /* Keep the local transport socket room unset until its own join message is processed. */ws.readyState=1;if(ws.onopen)ws.onopen();
+      }else{
+        if(connecting)return;connecting=true;
+        let conn;try{conn=peer.connect(invitePeer,{reliable:true});}catch(e){status("Could not reach the host. Ask them to recreate the invite link.");return;}
+        ws.conn=conn;
+        conn.on("open",()=>{if(S.ws!==ws)return;ws.readyState=1;if(ws.onopen)ws.onopen();});
+        conn.on("data",data=>{if(S.ws!==ws||!ws.onmessage)return;ws.onmessage({data:typeof data==="string"?data:JSON.stringify(data)});});
+        conn.on("close",()=>{if(ws.readyState===3)return;ws.readyState=3;if(ws.onclose)ws.onclose();});
+        conn.on("error",()=>{status("Connection to the host failed. Check that their tab is still open.");});
+      }
+    });
+    peer.on("error",err=>{
+      if(S.ws!==ws)return;
+      const type=err&&err.type||"";
+      if(!opened){
+        if(type==="peer-unavailable")status("The host is offline. Ask them to open the game and create a fresh room.");
+        else status("Multiplayer connection failed ("+(type||"network error")+"). Refresh and try again.");
+      }else if(type==="network"||type==="socket-error"||type==="server-error")status("The free signalling service is temporarily unreachable. Try again shortly.");
+    });
   }
-
   function onMsg(m){
     switch(m.t){
       case "joined":
         S.id=m.id;S.room=m.room;setRoster(m);showStage("room");status("");
-        SS("cn_mp_auto",JSON.stringify({room:m.room,name:S.name,server:$("mpServer").value}));
-        history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname+"?room="+m.room+(/[?&]server=/.test(location.search)?"&server="+encodeURIComponent($("mpServer").value):""));
+        SS("cn_mp_auto",JSON.stringify({room:m.room,name:S.name,peer:getInvitePeer()}));
+        if(getInvitePeer())history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname+"?room="+m.room+"&cnpeer="+encodeURIComponent(getInvitePeer()));
         break;
       case "roster":{
         const before=new Set(S.roster.map(r=>r.id));
@@ -9968,9 +10075,10 @@ const CNMP=(function(){
   function showStage(w){$("mpStageConn").style.display=w==="conn"?"":"none";$("mpStageRoom").style.display=w==="room"?"":"none";}
   function openLobby(){
     $("mpName").value=LS("cn_mp_name")||"";
-    $("mpServer").value=defaultServer();
-    const q=(location.search.match(/[?&]room=([A-Za-z0-9]{3,6})/)||[])[1];
-    if(q&&!$("mpRoomIn").value)$("mpRoomIn").value=q.toUpperCase();
+    $("mpServer").value="";
+    const q=getQueryRoom();
+    if(q&&!$("mpRoomIn").value)$("mpRoomIn").value=q;
+    if(getInvitePeer()){$("mpCreate").style.display="none";$ ("mpJoin").textContent="Join invite";}else{$("mpCreate").style.display="";$("mpJoin").textContent="Join room";}
     lobby.classList.add("open");$("safeHome").style.display="none";
     if(!S.room)showStage("conn");else showStage("room");
   }
@@ -10009,10 +10117,13 @@ const CNMP=(function(){
   function doJoin(create){
     const name=($("mpName").value||"").trim().slice(0,16)||"Sorcerer";
     S.name=name;LS("cn_mp_name",name);
-    const code=($("mpRoomIn").value||"").trim().toUpperCase();
-    if(!create&&code.length<3){status("Enter the room code your friend gave you.");return;}
+    let code=($("mpRoomIn").value||"").trim().toUpperCase();
+    const invitedPeer=getInvitePeer();
+    if(create)code=makeRoomCode();
+    else if(invitedPeer)code=getQueryRoom()||code;
+    if(!create&&(!invitedPeer||code.length<3)){status("Use the invite link your friend copied from their room.");return;}
     S.wantLeave=false;
-    connect(()=>{send({t:"join",name,char:CHAR,room:code,create:!!create,rejoin:S.rejoin});S.rejoin=false;});
+    connect(()=>{send({t:"join",name,char:CHAR,room:code,create:!!create,rejoin:false});S.rejoin=false;},!!create,code);
   }
   $("mpCreate").onclick=()=>doJoin(true);
   $("mpJoin").onclick=()=>doJoin(false);
@@ -10021,15 +10132,17 @@ const CNMP=(function(){
   $("mpLeave").onclick=leaveRoom;
   $("mpStart").onclick=()=>{if(S.started)beginRun();else if(S.host===S.id)send({t:"start"});};
   $("mpCode").onclick=()=>{
-    const srv=($("mpServer").value||"").trim();
-    const sameOrigin=/^https?:/.test(location.protocol)&&srv.replace(/^wss?:\/\//i,"")===location.host;
-    const link=/^https?:/.test(location.protocol)?location.origin+location.pathname+"?room="+S.room+(sameOrigin||!srv?"":"&server="+encodeURIComponent(srv)):S.room;
-    try{navigator.clipboard.writeText(link);status("Copied: "+link);}catch(_){status("Room code: "+S.room);}
+    const link=inviteLink();
+    if(!link){status("Invite link is not ready yet. Create a room first.");return;}
+    const done=()=>status("Invite link copied! Send it to friends and keep this tab open.");
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done).catch(()=>window.prompt("Copy this invite link and send it to friends:",link));else window.prompt("Copy this invite link and send it to friends:",link);}catch(_){window.prompt("Copy this invite link and send it to friends:",link);}
   };
   function leaveRoom(){
     S.wantLeave=true;SS("cn_mp_auto",null);
     if(S.ws){try{S.ws.onclose=null;S.ws.close();}catch(_){}}
     S.ws=null;S.conn=false;S.room=null;S.id=null;S.roster=[];S.started=false;
+    if(cnClientPeer){try{cnClientPeer.destroy();}catch(_){}cnClientPeer=null;}
+    if(cnHostPeer){try{cnHostPeer.destroy();}catch(_){}cnHostPeer=null;cnRelayRoom=null;}
     history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname);
     showStage("conn");status("");
   }
@@ -10286,15 +10399,18 @@ const CNMP=(function(){
   const _svic=showVictory;showVictory=function(){const r=_svic.apply(this,arguments);endHook();return r;};
   const _hit=hitPlayer;hitPlayer=function(){if(S.active&&(S.down||S.dead))return 0;return _hit.apply(this,arguments);};
 
-  // auto-rejoin after R / quit (page reload) → straight back to the lobby
+  // Invite-link flow: friends land straight in the co-op lobby and connect.
+  // A host is the temporary relay, so the host tab must remain open.
   setTimeout(()=>{
+    if(getInvitePeer()){
+      SS("cn_mp_auto",null);openLobby();
+      const room=getQueryRoom();if(room)$("mpRoomIn").value=room;
+      const savedName=LS("cn_mp_name");$("mpName").value=savedName||"Sorcerer";
+      doJoin(false);return;
+    }
     const raw=SS("cn_mp_auto");
-    if(!raw){if(/[?&]room=[A-Za-z0-9]{3,6}/.test(location.search))openLobby();return;}
-    let o;try{o=JSON.parse(raw);}catch(_){return;}
-    if(!o||!o.room)return;
-    openLobby();$("mpRoomIn").value=o.room;$("mpName").value=o.name||$("mpName").value;if(o.server)$("mpServer").value=o.server;
-    S.rejoin=true;doJoin(false);
-  },350);
+    if(raw){SS("cn_mp_auto",null);}
+  },650);
 
   return {S,onDeath,frozen,sim,drawAllies,openLobby,beginRun,send,relay,onRelay,tick};
 })();
