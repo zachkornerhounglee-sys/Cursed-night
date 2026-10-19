@@ -816,6 +816,73 @@ canvas{display:block;image-rendering:auto}
 </style>
 
 
+<style id="cn-v14-polish">
+:root{color-scheme:dark;--cn-accent:#8c72ff;--cn-cyan:#5bc8ff;--cn-pink:#ff4f87}
+#titlescreen{background:radial-gradient(ellipse at 16% 16%,rgba(91,200,255,.14),transparent 34%),radial-gradient(ellipse at 86% 22%,rgba(196,122,255,.18),transparent 35%),radial-gradient(ellipse at 50% 100%,rgba(255,79,109,.08),transparent 45%),#03040b}
+#titlecanvas{opacity:.7}
+#titlefade{background:radial-gradient(ellipse at center,rgba(2,3,10,.08),rgba(2,3,10,.58) 78%,rgba(2,3,10,.88))}
+#titlewrap{box-sizing:border-box;width:min(1140px,calc(100vw - 36px));max-height:calc(100dvh - 32px);overflow-y:auto;overflow-x:hidden;padding:clamp(18px,3vw,34px) clamp(14px,3vw,38px) 20px;gap:10px;border-radius:28px;border:1px solid rgba(188,173,255,.18);background:linear-gradient(145deg,rgba(13,16,34,.88),rgba(5,7,18,.91) 58%,rgba(14,8,28,.87));box-shadow:0 30px 100px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.025) inset,0 0 90px rgba(126,87,255,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);scrollbar-width:thin;scrollbar-color:rgba(157,140,255,.35) transparent;isolation:isolate}
+#titlewrap:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:linear-gradient(110deg,transparent 10%,rgba(91,200,255,.045) 40%,transparent 70%),radial-gradient(ellipse at 50% 0%,rgba(196,122,255,.1),transparent 60%)}
+#titlewrap:after{content:"JUJUTSU ROGUELIKE  /  SOLO • CO-OP";display:block;margin-top:2px;color:rgba(218,221,255,.32);font:600 9px 'Exo 2',sans-serif;letter-spacing:.22em;text-align:center}
+#titlelogo{font-size:clamp(38px,6vw,76px);line-height:1.05;letter-spacing:.075em;text-align:center;text-wrap:balance;text-shadow:0 0 24px rgba(91,200,255,.46),0 0 70px rgba(196,122,255,.4);animation:cnTitlePulse 5.5s ease-in-out infinite}
+@keyframes cnTitlePulse{0%,100%{filter:brightness(1);text-shadow:0 0 24px rgba(91,200,255,.46),0 0 70px rgba(196,122,255,.4)}50%{filter:brightness(1.1);text-shadow:0 0 34px rgba(196,122,255,.62),0 0 82px rgba(255,79,135,.25)}}
+#effectsubtitle{font-size:clamp(9px,1.25vw,11px);font-weight:800;letter-spacing:.42em;opacity:.82;margin-top:0;color:#c6a5ff;text-align:center}
+#titlesub{font-size:10px;letter-spacing:.28em;margin-top:0;color:rgba(239,237,255,.62);opacity:1;text-align:center}
+#charrow{width:100%;max-width:100%;box-sizing:border-box;margin-top:13px;gap:9px;align-items:stretch}
+.charcard{box-sizing:border-box;flex:1 1 82px;min-width:70px;max-width:112px;padding:12px 7px 10px;border-radius:14px;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.045);transition:transform .18s,border-color .18s,background .18s,box-shadow .18s}
+.charcard:hover{transform:translateY(-3px);background:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035));box-shadow:0 12px 28px rgba(0,0,0,.25)}
+.charcard.sel{background:linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,.035));box-shadow:0 0 24px -8px var(--cc),inset 0 0 18px -10px var(--cc),inset 0 1px 0 rgba(255,255,255,.12)}
+.charic{font-size:27px;filter:none;opacity:.78;transition:transform .2s,opacity .2s}.charcard.sel .charic{opacity:1;transform:translateY(-2px) scale(1.08)}
+.charname{font-size:10px;letter-spacing:.08em;opacity:.8}.charcard.sel .charname{opacity:1}
+#charpassive,#passiveOnly{font-size:11px;max-width:660px;line-height:1.55;color:rgba(224,224,255,.8);text-align:center;margin:2px auto 0}
+#titlemodes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px}
+.modechip{padding:8px 15px;min-width:96px;text-align:center;font-size:10px;opacity:.72;background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.12)}
+.modechip.sel{opacity:1;border-color:rgba(91,200,255,.55);color:#a8e9ff;background:linear-gradient(135deg,rgba(91,200,255,.11),rgba(196,122,255,.1));box-shadow:0 0 18px rgba(91,200,255,.08)}
+#titlebtns{width:min(620px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+#titlebtns .tbtn{min-height:46px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border-color:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);font-size:12px;letter-spacing:.1em}
+#titlebtns .tbtn.primary{grid-column:1/-1;min-height:54px;color:#fff;border-color:rgba(155,134,255,.5);background:linear-gradient(100deg,rgba(91,200,255,.2),rgba(157,140,255,.23),rgba(255,79,135,.14));box-shadow:0 8px 30px rgba(91,100,255,.13),inset 0 1px 0 rgba(255,255,255,.12);font-size:14px}
+#titlebtns .tbtn.primary:hover{box-shadow:0 10px 35px rgba(91,100,255,.22),0 0 26px rgba(196,122,255,.16);border-color:rgba(204,187,255,.8)}
+#titlebtns .tbtn.secret{grid-column:1/-1}
+#titlebest{margin:5px auto 0;font-size:10px;line-height:1.7;opacity:.65;max-width:720px}
+#titlever{opacity:.55;right:22px;bottom:16px}
+#settingspanel{padding:16px;box-sizing:border-box}
+#setinner{box-sizing:border-box;width:min(94vw,690px);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(157,140,255,.35) transparent}
+#setT{font-size:22px;color:#e7ddff;text-shadow:0 0 20px rgba(196,122,255,.18)}
+#setS{margin-bottom:13px;line-height:1.5}
+.setrow{padding:10px 0;gap:12px}
+.setlbl{font-size:12px}.setdsc{font-size:10px;max-width:410px;opacity:.56}
+#setinner .sbtns{position:sticky;bottom:-28px;padding-top:12px;padding-bottom:2px;background:linear-gradient(180deg,rgba(5,6,18,0),rgba(5,6,18,.98) 22%)}
+#mpLobby{box-sizing:border-box;padding:14px;overflow-y:auto;overscroll-behavior:contain}
+#mpCard{width:min(94vw,660px);max-height:calc(100dvh - 28px);overflow-y:auto;box-sizing:border-box;border-radius:22px!important;padding:clamp(18px,3vw,30px)!important;background:linear-gradient(150deg,rgba(13,16,35,.98),rgba(5,7,18,.985))!important;border:1px solid rgba(157,140,255,.27)!important;box-shadow:0 28px 100px rgba(0,0,0,.7),0 0 55px rgba(120,95,255,.1)!important;scrollbar-width:thin}
+#mpCard h2{font-size:25px!important;letter-spacing:.18em!important;text-shadow:0 0 25px rgba(157,140,255,.35)}
+#mpCard .sub{margin-bottom:20px!important;line-height:1.5}
+#mpCard label{display:block;margin:12px 0 7px;color:rgba(231,230,255,.8);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+#mpCard input[type=text]{box-sizing:border-box;width:100%;min-height:44px;border:1px solid rgba(184,170,255,.22);border-radius:10px;background:rgba(255,255,255,.04);color:#fff;padding:11px 13px;outline:none}
+#mpCard input[type=text]:focus{border-color:rgba(91,200,255,.65);box-shadow:0 0 0 3px rgba(91,200,255,.08)}
+#mpStageConn .mpHint{line-height:1.6;font-size:11px;letter-spacing:.04em;opacity:.65;margin:14px 0}
+#mpBtns{display:grid;grid-template-columns:1fr;gap:9px;margin-top:15px}
+#mpBtns .mpb,#mpInviteBtns .mpb{min-height:48px;border-radius:12px;font-size:11px;letter-spacing:.12em}
+#mpInviteState{margin:10px 0 14px;text-align:center;font-size:12px;line-height:1.6;color:rgba(228,229,255,.78)}
+#mpInviteBtns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 18px}
+#mpInviteBtns .mpb.go{background:linear-gradient(135deg,#2bba89,#69f2c2);box-shadow:0 8px 26px rgba(47,255,176,.1)}
+#mpStatus{min-height:20px;color:#ffd77c;font-size:12px;line-height:1.5;margin-top:14px}
+#mpRoster{gap:8px}#mpRoster .mpR{min-height:42px;border-radius:11px;background:rgba(255,255,255,.035)}
+#mpChars{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+@media(max-width:760px){
+ #titlewrap{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:17px 12px 14px;gap:8px;border-radius:18px}
+ #titlelogo{font-size:clamp(32px,8vw,52px)}#effectsubtitle{letter-spacing:.28em}
+ #charrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-width:460px}
+ .charcard{min-width:0;max-width:none;width:auto;padding:9px 4px 8px;border-radius:11px}.charic{font-size:23px;margin-bottom:3px}.charname{font-size:10px}
+ #titlebtns{max-width:460px;gap:7px;margin-top:7px}#titlebtns .tbtn{min-height:44px;padding:10px 8px;font-size:11px}#titlebtns .tbtn.primary{min-height:49px;font-size:13px}
+ #titlemodes{gap:6px}.modechip{flex:1;min-width:0;padding:7px 8px;font-size:9px}
+ #titlever{right:8px;bottom:6px;font-size:8px}
+ #mpCard{width:min(100%,600px);padding:18px 14px!important;border-radius:18px!important}
+ #mpInviteBtns{grid-template-columns:1fr}#mpChars{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .mpR .ch{display:none}
+}
+@media(max-height:680px) and (min-width:761px){#titlewrap{padding:13px 24px 12px;gap:5px}#titlelogo{font-size:clamp(34px,5vh,54px)}#charrow{margin-top:7px}.charcard{padding:8px 5px}.charic{font-size:22px;margin-bottom:2px}#titlebtns{margin-top:5px;gap:6px}#titlebtns .tbtn{min-height:38px;padding:8px}}
+@media(prefers-reduced-motion:reduce){#titlelogo{animation:none!important}.charcard,.tbtn,.modechip{transition:none!important}*{scroll-behavior:auto!important}}
+</style>
 </head>
 
 <body>
@@ -6600,11 +6667,29 @@ document.getElementById("btnSetBack").onclick=closeSettings;document.getElementB
 })();
 
 const slp=document.getElementById("sl-p"),slpv=document.getElementById("sl-pv");
-
-slp.oninput=()=>{slpv.textContent=["Off","Mid","High"][+slp.value];applySettings();};
-
-["tog-auto","tog-shake","tog-skip","tog-dmg"].forEach(id=>document.getElementById(id).onchange=applySettings);
-document.getElementById("sel-quality").onchange=applySettings;document.getElementById("sel-fps").onchange=applySettings;
+const CN_BASE_GFX_KEY="cursedNight.graphics.v14";
+(function(){
+  const ids=["tog-auto","tog-shake","tog-skip","tog-dmg","sl-p","sel-quality","sel-fps"];
+  try{
+    const saved=JSON.parse(localStorage.getItem(CN_BASE_GFX_KEY)||"{}");
+    for(const id of ids){
+      const el=document.getElementById(id);if(!el||saved[id]===undefined)continue;
+      if(el.type==="checkbox"&&typeof saved[id]==="boolean")el.checked=saved[id];
+      else if(id==="sel-quality"&&["low","balanced","ultra"].includes(saved[id]))el.value=saved[id];
+      else if(id==="sel-fps"&&["30","60","90","120"].includes(String(saved[id])))el.value=String(saved[id]);
+      else if(id==="sl-p"&&[0,1,2].includes(Number(saved[id])))el.value=String(saved[id]);
+    }
+  }catch(_){}
+  function saveSettings(){
+    applySettings();
+    try{const o={};for(const id of ids){const el=document.getElementById(id);o[id]=el.type==="checkbox"?el.checked:el.value;}localStorage.setItem(CN_BASE_GFX_KEY,JSON.stringify(o));}catch(_){}
+  }
+  slp.oninput=()=>{slpv.textContent=["Off","Mid","High"][+slp.value];saveSettings();};
+  ["tog-auto","tog-shake","tog-skip","tog-dmg"].forEach(id=>document.getElementById(id).onchange=saveSettings);
+  document.getElementById("sel-quality").onchange=saveSettings;document.getElementById("sel-fps").onchange=saveSettings;
+  slpv.textContent=["Off","Mid","High"][+slp.value];
+  applySettings();
+})();
 
 
 // ===================================================================
@@ -9129,7 +9214,7 @@ const GFX={
   A:null,ax:null,B:null,bx:null,C:null,cx:null,snap:null,sx:null,
   grain:null,scan:null,hurt:null,filterOK:false,ready:false
 };
-CNX.meta.gfx=Object.assign({flare:true,bloom:true,grain:true,chroma:true,motes:true,scan:false,hudskin:true},CNX.meta.gfx||{});
+CNX.meta.gfx=Object.assign({flare:true,bloom:true,grain:true,chroma:true,motes:true,scan:false,hudskin:true,enemyGlow:true,playerAura:true,projectileGlow:true,projectileTrails:true,shadows:true,impactFlash:true,damageVignette:true,stageTint:true,dashStreaks:true,fog:true,hitParticles:true,showFPS:false},CNX.meta.gfx||{});
 function gfxOpt(k){
   // Disable the most fill-rate-heavy overlays on lower-memory/CPU devices and
   // while the live frame-rate controller is already under pressure.
@@ -9140,6 +9225,7 @@ function gfxOpt(k){
 function gfxLevel(){
   let q=CFG.quality==="low"?0:CFG.quality==="ultra"?2:1;
   if(CN_DEVICE_LOW_POWER)q=Math.min(q,1);
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)q=Math.min(q,1);
   if(PERF.fx===0)q=0;else if(PERF.fx===1)q=Math.min(q,1);
   return q;
 }
@@ -9173,7 +9259,7 @@ function gfxBg(){
   const ts=CNX.timeScale||1;
   CTX.save();CTX.globalCompositeOperation="lighter";
   // drifting fog banks
-  if(lvl>=1){
+  if(lvl>=1&&gfxOpt("fog")){
     const n=lvl>=2?5:3;
     for(let i=0;i<n;i++){
       const sp=6+i*3.5,x=((bgT*sp+i*260)%(W+520))-260;
@@ -9202,23 +9288,25 @@ function gfxBg(){
 // ---------- hit feedback ----------
 function gfxOnHit(e,d){
   // only real hits flash — DOT ticks (burn/poison) fire every frame and would strobe
-  if(!e||d<1.5||gT-(e._hfT||-9)<.14)return;
+  if(!gfxOpt("impactFlash")||!e||d<1.5||gT-(e._hfT||-9)<.14)return;
   e._hfT=gT;e._hf=.1;
 }
 
 // ---------- enemies ----------
 function gfxEnemiesUnder(){
   if(!enemies.length)return;
-  CTX.save();CTX.globalCompositeOperation="lighter";
-  const lvl=gfxLevel();
-  for(const e of enemies){
-    if(e.isDecoy)continue;
-    const r=e.r||14,col=gfxEnemyCol(e),big=(e.isBoss?1.9:(e.miniBoss||e.vtag)?1.35:1);
-    const pulse=1+Math.sin(bgT*4+e.x*.05)*.09;
-    gfxGlowAt(e.x,e.y,col,r*3*big*pulse,e.isBoss?.5:(lvl>=1?.3:.2));
+  if(gfxOpt("enemyGlow")){
+    CTX.save();CTX.globalCompositeOperation="lighter";
+    const lvl=gfxLevel();
+    for(const e of enemies){
+      if(e.isDecoy)continue;
+      const r=e.r||14,col=gfxEnemyCol(e),big=(e.isBoss?1.9:(e.miniBoss||e.vtag)?1.35:1);
+      const pulse=1+Math.sin(bgT*4+e.x*.05)*.09;
+      gfxGlowAt(e.x,e.y,col,r*3*big*pulse,e.isBoss?.5:(lvl>=1?.3:.2));
+    }
+    CTX.restore();CTX.globalAlpha=1;
   }
-  CTX.restore();CTX.globalAlpha=1;
-  for(const e of enemies){if(!e.isDecoy)drShadow(e.x,e.y,e.r||14);}
+  if(gfxOpt("shadows"))for(const e of enemies){if(!e.isDecoy)drShadow(e.x,e.y,e.r||14);}
 }
 function gfxEnemiesOver(){
   if(!enemies.length)return;
@@ -9227,30 +9315,34 @@ function gfxEnemiesOver(){
   for(const e of enemies){
     if(e.isDecoy)continue;
     const r=e.r||14,col=gfxEnemyCol(e);
-    gfxGlowAt(e.x,e.y,col,r*1.25,.22);
-    // glowing eyes
-    gfxGlowAt(e.x-r*.24,e.y-r*.08,col,5,.9);gfxGlowAt(e.x+r*.24,e.y-r*.08,col,5,.9);
-    // hit flash
+    if(gfxOpt("enemyGlow")){
+      gfxGlowAt(e.x,e.y,col,r*1.25,.22);
+      // glowing eyes
+      gfxGlowAt(e.x-r*.24,e.y-r*.08,col,5,.9);gfxGlowAt(e.x+r*.24,e.y-r*.08,col,5,.9);
+    }
+    // hit flash is separate from the lower-cost status rings
     if(e._hf>0){
       e._hf-=1/60;
-      CTX.globalAlpha=Math.min(.8,e._hf*8);CTX.fillStyle="#fff";
-      CTX.beginPath();CTX.arc(e.x,e.y,r*1.05,0,6.283);CTX.fill();
+      if(gfxOpt("impactFlash")){
+        CTX.globalAlpha=Math.min(.8,e._hf*8);CTX.fillStyle="#fff";
+        CTX.beginPath();CTX.arc(e.x,e.y,r*1.05,0,6.283);CTX.fill();
+      }
     }
     // boss halo: orbiting sparks
-    if(e.isBoss&&lvl>=1){
+    if(e.isBoss&&lvl>=1&&gfxOpt("enemyGlow")){
       for(let k=0;k<6;k++){
         const a=t*1.3+k*1.047;
         gfxGlowAt(e.x+Math.cos(a)*r*1.55,e.y+Math.sin(a)*r*1.55,col,6,.8);
       }
     }
     // status effects
-    if(e.stun>0){
+    if(gfxOpt("enemyGlow")&&e.stun>0){
       for(let k=0;k<3;k++){const a=t*5+k*2.09;gfxGlowAt(e.x+Math.cos(a)*r*.8,e.y-r-6+Math.sin(a)*3,"#ffffff",4.5,.9);}
     }
-    if(e.burn>0){
+    if(gfxOpt("enemyGlow")&&e.burn>0){
       for(let k=0;k<3;k++)gfxGlowAt(e.x+Math.sin(t*9+k*2)*r*.5,e.y-r*.2-((t*40+k*13)%r*1.1),"#ff8a2f",6,.75);
     }
-    if(e.poison>0){
+    if(gfxOpt("enemyGlow")&&e.poison>0){
       for(let k=0;k<2;k++)gfxGlowAt(e.x+Math.sin(t*4+k*3)*r*.6,e.y+r*.3-((t*22+k*17)%r*1.2),"#62d39c",5,.7);
     }
     if(e.brokenT>0)gfxGlowAt(e.x,e.y,"#ffe070",r*2.4,.28+.1*Math.sin(t*14));
@@ -9279,20 +9371,22 @@ function gfxEnemiesOver(){
 // ---------- player ----------
 function gfxPlayerUnder(){
   const col=P.sukActive?"#ff1744":P.berserk?"#ff7a2f":gfxCharCol(),lvl=gfxLevel();
-  CTX.save();CTX.globalCompositeOperation="lighter";
-  gfxGlowAt(P.x,P.y,col,P.r*5.2,.34);
-  // rotating ground sigil
-  CTX.translate(P.x,P.y);
-  CTX.strokeStyle=col;CTX.lineWidth=1.4;
-  CTX.rotate(bgT*.7);CTX.globalAlpha=.3;
-  for(let i=0;i<6;i++){CTX.beginPath();CTX.arc(0,0,P.r*2.7,i*1.047,i*1.047+.62);CTX.stroke();}
-  if(lvl>=1){
-    CTX.rotate(-bgT*1.5);CTX.globalAlpha=.16;
-    for(let i=0;i<8;i++){CTX.beginPath();CTX.arc(0,0,P.r*3.5,i*.785,i*.785+.3);CTX.stroke();}
+  if(gfxOpt("playerAura")){
+    CTX.save();CTX.globalCompositeOperation="lighter";
+    gfxGlowAt(P.x,P.y,col,P.r*5.2,.34);
+    // rotating ground sigil
+    CTX.translate(P.x,P.y);
+    CTX.strokeStyle=col;CTX.lineWidth=1.4;
+    CTX.rotate(bgT*.7);CTX.globalAlpha=.3;
+    for(let i=0;i<6;i++){CTX.beginPath();CTX.arc(0,0,P.r*2.7,i*1.047,i*1.047+.62);CTX.stroke();}
+    if(lvl>=1){
+      CTX.rotate(-bgT*1.5);CTX.globalAlpha=.16;
+      for(let i=0;i<8;i++){CTX.beginPath();CTX.arc(0,0,P.r*3.5,i*.785,i*.785+.3);CTX.stroke();}
+    }
+    CTX.restore();CTX.globalAlpha=1;
   }
-  CTX.restore();CTX.globalAlpha=1;
   // dash streaks
-  if(CNX.dash.active){
+  if(CNX.dash.active&&gfxOpt("dashStreaks")){
     CTX.save();CTX.globalCompositeOperation="lighter";CTX.strokeStyle="#9ff3ff";CTX.lineCap="round";
     for(let i=0;i<7;i++){
       const off=(i-3)*5,sx=P.x-CNX.dash.dx*(14+i*4)+(-CNX.dash.dy)*off,sy=P.y-CNX.dash.dy*(14+i*4)+CNX.dash.dx*off;
@@ -9324,17 +9418,17 @@ function gfxBulletsUnder(){
   for(const b of bullets){
     const col=b.isSukuna?"#ff1744":b.isPurpleUlt?"#c47aff":b.burn?"#ff7a2f":b.poison?"#62d39c":cc;
     const sz=b.sz||6;
-    gfxGlowAt(b.x,b.y,col,sz*3.4,.55);
-    if(sz>=11&&gfxOpt("flare")&&gfxLevel()>=1)gfxStreakAt(b.x,b.y,col,sz*11,sz*.9,.55);
-    if(fast&&(b.vx||b.vy)){
+    if(gfxOpt("projectileGlow"))gfxGlowAt(b.x,b.y,col,sz*3.4,.55);
+    if(gfxOpt("projectileGlow")&&sz>=11&&gfxOpt("flare")&&gfxLevel()>=1)gfxStreakAt(b.x,b.y,col,sz*11,sz*.9,.55);
+    if(gfxOpt("projectileTrails")&&fast&&(b.vx||b.vy)){
       CTX.globalAlpha=.3;CTX.strokeStyle=col;CTX.lineWidth=Math.max(1.5,sz*.7);CTX.lineCap="round";
       CTX.beginPath();CTX.moveTo(b.x,b.y);CTX.lineTo(b.x-b.vx*.03,b.y-b.vy*.03);CTX.stroke();
     }
   }
   for(const p of eProj){
     const col=gfxHex(p.col);
-    gfxGlowAt(p.x,p.y,col,15,.55);
-    if(p.vx||p.vy){CTX.globalAlpha=.25;CTX.strokeStyle=col;CTX.lineWidth=3;CTX.lineCap="round";CTX.beginPath();CTX.moveTo(p.x,p.y);CTX.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);CTX.stroke();}
+    if(gfxOpt("projectileGlow"))gfxGlowAt(p.x,p.y,col,15,.55);
+    if(gfxOpt("projectileTrails")&&(p.vx||p.vy)){CTX.globalAlpha=.25;CTX.strokeStyle=col;CTX.lineWidth=3;CTX.lineCap="round";CTX.beginPath();CTX.moveTo(p.x,p.y);CTX.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);CTX.stroke();}
   }
   CTX.restore();CTX.globalAlpha=1;
 }
@@ -9342,7 +9436,7 @@ function gfxBulletsUnder(){
 // ---------- particles + floating text ----------
 function gfxDrawFX(){
   const lvl=gfxLevel();
-  if(PERF.fx>0){
+  if(PERF.fx>0&&gfxOpt("hitParticles")){
     CTX.save();CTX.globalCompositeOperation="lighter";
     for(let i=0;i<parts.length;i++){
       const p=parts[i],lr=p.life/p.ml,sz=p.sz*(.55+lr*.45);
@@ -9482,27 +9576,29 @@ function gfxPost(){
   gfxPrepare();
   const lvl=gfxLevel(),dt=1/60;
   if(GFX.lastHP===null)GFX.lastHP=P.hp;
-  if(gameStarted&&P.hp<GFX.lastHP-.5){GFX.hurtT=.4;GFX.caT=Math.max(GFX.caT,.3);}
+  if(gfxOpt("damageVignette")&&gameStarted&&P.hp<GFX.lastHP-.5){GFX.hurtT=.4;GFX.caT=Math.max(GFX.caT,.3);}
   GFX.lastHP=P.hp;
-  if(CNX.reflexT>3.15)GFX.caT=Math.max(GFX.caT,.22);
+  if(gfxOpt("impactFlash")&&CNX.reflexT>3.15)GFX.caT=Math.max(GFX.caT,.22);
   GFX.hurtT=Math.max(0,GFX.hurtT-dt);GFX.caT=Math.max(0,GFX.caT-dt);
   if(!gameStarted)return;
   gfxDrawFlares();
   if(gfxOpt("bloom")&&lvl>=1)gfxBloom(lvl);
   if(gfxOpt("chroma")&&GFX.caT>0&&lvl>=1)gfxChroma();
   CTX.save();
-  // stage colour grade
+  // Optional stage colour grade
   const ac=gfxHex((LEVELS[lvIdx]&&LEVELS[lvIdx].ac)||"#5bc8ff");
-  CTX.globalAlpha=.05;CTX.fillStyle=ac;CTX.fillRect(0,0,W,H);
-  // hurt flash + low-HP heartbeat
-  const low=P.maxHP>0&&P.hp/P.maxHP<.3&&!over;
-  let ha=GFX.hurtT>0?GFX.hurtT/.4*.55:0;
-  if(low)ha=Math.max(ha,.16+.14*(.5+.5*Math.sin(Date.now()*.0105)));
-  if(ha>0){CTX.globalAlpha=Math.min(.7,ha);CTX.drawImage(GFX.hurt,0,0,W,H);}
+  if(gfxOpt("stageTint")){CTX.globalAlpha=.05;CTX.fillStyle=ac;CTX.fillRect(0,0,W,H);}
+  // Optional damage vignette; removing it also removes the low-HP pulse overlay.
+  if(gfxOpt("damageVignette")){
+    const low=P.maxHP>0&&P.hp/P.maxHP<.3&&!over;
+    let ha=GFX.hurtT>0?GFX.hurtT/.4*.55:0;
+    if(low)ha=Math.max(ha,.16+.14*(.5+.5*Math.sin(Date.now()*.0105)));
+    if(ha>0){CTX.globalAlpha=Math.min(.7,ha);CTX.drawImage(GFX.hurt,0,0,W,H);}
+  }
   // bullet-time desaturation hint
   if(CNX.timeScale<.95){CTX.globalCompositeOperation="lighter";CTX.globalAlpha=(1-CNX.timeScale)*.07;CTX.fillStyle="#6fd8ff";CTX.fillRect(0,0,W,H);CTX.globalCompositeOperation="source-over";}
   // dash speed lines
-  if(CNX.dash.active){
+  if(CNX.dash.active&&gfxOpt("dashStreaks")){
     CTX.globalCompositeOperation="lighter";CTX.strokeStyle="#bff6ff";CTX.lineWidth=1.4;CTX.globalAlpha=.3;
     for(let i=0;i<22;i++){
       const a=i/22*6.283+bgT,r1=H*.5+((i*37)%50),r2=r1+90+((i*53)%60);
@@ -9564,20 +9660,43 @@ function gfxSettingsInit(){
   const st=document.createElement("style");st.textContent=GFX_CSS;document.head.appendChild(st);
   gfxApplySkin();
   const bt=document.querySelector("#setinner .sbtns");if(!bt)return;
+  const section=document.createElement("div");section.style.cssText="margin:18px 0 4px;padding-bottom:7px;border-bottom:1px solid rgba(157,140,255,.18);color:#b6a8ff;font:800 10px 'Exo 2',sans-serif;letter-spacing:.2em;text-transform:uppercase";section.textContent="Graphics & Performance";bt.parentNode.insertBefore(section,bt);
   const rows=[
-    ["flare","Lens Flares","Streaks, starbursts and ghost rings on big hits, perfect dodges and awakenings."],
-    ["bloom","Bloom & Glow","Soft light bleed around bright effects. Needs Balanced or Ultra quality."],
-    ["motes","Ambient Particles","Drifting cursed-energy motes and fog banks."],
-    ["chroma","Hit Distortion","Colour-split flash when you are hit or perfect-dodge."],
-    ["grain","Film Grain","Fine texture over the whole image."],
-    ["scan","Scanlines","Retro CRT lines (off by default)."],
-    ["hudskin","Glass HUD Skin","Frosted-glass panels and glowing bars."]
+    ["flare","Lens Flares","Streaks and starbursts on high-impact techniques."],
+    ["bloom","Bloom & Glow","Soft light around bright effects. Most visible on Balanced or Ultra."],
+    ["motes","Ambient Particles","Drifting cursed-energy motes in the arena."],
+    ["fog","Background Fog","Slow colour fog that gives each arena more depth."],
+    ["enemyGlow","Enemy Auras & Hit FX","Enemy glows, glowing eyes, boss halos and small status sparks."],
+    ["playerAura","Player Aura & Sigil","Soft character light and the rotating ground sigil."],
+    ["projectileGlow","Projectile Glow","Coloured light around friendly and enemy projectiles."],
+    ["projectileTrails","Projectile Trails","Short motion streaks that help show projectile direction."],
+    ["shadows","Soft Ground Shadows","Shadows below characters and enemies for depth."],
+    ["hitParticles","Hit Particles","Small particles from hits, slashes and explosions."],
+    ["impactFlash","Impact Flash","Brief white impact highlights and perfect-dodge flashes."],
+    ["damageVignette","Damage Vignette","Red edge vignette and low-health pulse. Disable for a calmer screen."],
+    ["dashStreaks","Dash Streaks","Speed lines during dashes."],
+    ["stageTint","Stage Colour Tint","Subtle colour grade based on the current arena."],
+    ["chroma","Hit Distortion","Colour split on damage and perfect dodges; may cost performance."],
+    ["grain","Film Grain","Fine cinematic texture over the playfield."],
+    ["scan","Scanlines","Retro CRT lines; off by default."],
+    ["hudskin","Glass HUD Skin","Frosted-glass panels and gently glowing status bars."],
+    ["showFPS","FPS Counter","Show the live frame rate in the top corner during play."]
   ];
   for(const [k,lab,dsc] of rows){
     const row=document.createElement("div");row.className="setrow";
     row.innerHTML='<div class="seti"><div class="setlbl">'+lab+'</div><div class="setdsc">'+dsc+'</div></div><label class="tog"><input type="checkbox" id="gfx-'+k+'"'+(gfxOpt(k)?" checked":"")+'><div class="tog-track"></div><div class="tog-thumb"></div></label>';
     bt.parentNode.insertBefore(row,bt);
-    row.querySelector("input").onchange=e=>{CNX.meta.gfx[k]=e.target.checked;cnxMetaSave();if(k==="hudskin")gfxApplySkin();};
+    row.querySelector("input").onchange=e=>{
+      CNX.meta.gfx[k]=e.target.checked;cnxMetaSave();
+      if(k==="hudskin")gfxApplySkin();
+      if(k==="showFPS"&&window.cnFPSBadge)window.cnFPSBadge.style.display=e.target.checked?"block":"none";
+      if(k==="impactFlash"&&!e.target.checked){GFX.caT=0;GFX.hurtT=0;}
+    };
+  }
+  if(!window.cnFPSBadge){
+    const badge=document.createElement("div");badge.id="cnFPSBadge";badge.textContent="FPS --";
+    badge.style.cssText="position:fixed;z-index:9999;top:10px;right:12px;padding:5px 8px;border:1px solid rgba(91,200,255,.26);border-radius:8px;background:rgba(3,5,14,.78);color:#bdeeff;font:700 11px 'Exo 2',sans-serif;letter-spacing:.08em;pointer-events:none;display:"+(gfxOpt("showFPS")?"block":"none");
+    document.body.appendChild(badge);window.cnFPSBadge=badge;
   }
 }
 function gfxPlayerLight(){
@@ -9607,8 +9726,12 @@ sukInit();
 cnxTouchInit();
 gfxInit();
 
+let cnFrameGateTs=0;
 function loop(ts){
-
+  const wantedFps=Math.max(30,Math.min(120,Number(CFG.fps)||60));
+  const frameInterval=1000/wantedFps;
+  if(cnFrameGateTs&&ts-cnFrameGateTs<frameInterval-1){requestAnimationFrame(loop);return;}
+  cnFrameGateTs=ts;
   if(!lastTS)lastTS=ts;
 
   const rawDt=(ts-lastTS)/1000;
@@ -9617,6 +9740,7 @@ function loop(ts){
     PERF.fpsAccum+=rawDt;PERF.fpsFrames++;
     if(PERF.fpsAccum>=1){
       PERF.fps=PERF.fpsFrames/PERF.fpsAccum;PERF.fpsAccum=0;PERF.fpsFrames=0;
+      if(window.cnFPSBadge)window.cnFPSBadge.textContent="FPS "+Math.round(PERF.fps);
       if(PERF.fps<38){FX.max.sparks=Math.min(FX.max.sparks,70);FX.max.bursts=Math.min(FX.max.bursts,14);}
       else if(PERF.fps<46){FX.max.sparks=Math.min(FX.max.sparks,110);FX.max.bursts=Math.min(FX.max.bursts,20);}
       if(PERF.fps<32){PERF.fx=0;CFG.parts=0;PERF.maxParts=100;PERF.maxBullets=170;PERF.maxEnemyProjectiles=110;PERF.maxFloats=28;PERF.maxBFParts=45;}
@@ -9877,7 +10001,6 @@ const CNMP=(function(){
   .mpb.dim{opacity:.35;pointer-events:none}.mpb.bad{border-color:rgba(255,79,109,.5);background:rgba(255,79,109,.12)}
   #mpStatus{min-height:18px;margin-top:12px;font-size:12px;line-height:1.45;text-align:center;color:#ffd04a;overflow-wrap:anywhere}
   .mpb:disabled{opacity:.48;cursor:wait;filter:saturate(.6)}
-  #mpCode{font-family:'Cinzel Decorative',serif;font-size:34px;letter-spacing:.35em;text-align:center;color:#2fffb0;text-shadow:0 0 22px rgba(47,255,176,.5);margin:2px 0 2px;cursor:pointer;user-select:all}
   .mpHint{text-align:center;font-size:10px;opacity:.45;letter-spacing:.1em;margin-bottom:10px}
   #mpRoster{display:flex;flex-direction:column;gap:6px;margin:8px 0 10px}
   .mpR{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:13px}
@@ -9912,14 +10035,16 @@ const CNMP=(function(){
   lobby.innerHTML=`<div id="mpCard">
     <h2>CO-OP</h2><div class="sub" id="mpSub">fight the cursed night together</div>
     <div id="mpStageConn">
-      <label>Your name</label><input type="text" id="mpName" maxlength="16" placeholder="Sorcerer" autocomplete="off">
-      <input type="text" id="mpServer" autocomplete="off" spellcheck="false" value="" aria-hidden="true" tabindex="-1" style="display:none"><div class="mpHint" style="margin:4px 0 12px">Create a room, then click its code to copy one invite link. Keep the host tab open and visible while friends play.</div>
-      <label>Room code (to join a friend)</label><input type="text" id="mpRoomIn" maxlength="6" placeholder="ABCD" autocomplete="off" style="text-transform:uppercase;letter-spacing:.3em">
-      <div id="mpBtns"><button class="mpb go" id="mpCreate">Create room</button><button class="mpb" id="mpJoin">Join room</button></div>
+      <label>Your name</label><input type="text" id="mpName" maxlength="16" placeholder="Sorcerer" autocomplete="nickname">
+      <input type="text" id="mpServer" autocomplete="off" spellcheck="false" value="" aria-hidden="true" tabindex="-1" style="display:none">
+      <div class="mpHint" id="mpConnectHint">Create a private room, then share one invite link. Friends who open your invite will connect automatically. Keep your game tab open while they join.</div>
+      <div id="mpBtns"><button class="mpb go" id="mpCreate">✦ Create private room</button><button class="mpb" id="mpJoin" style="display:none">Retry connection</button></div>
       <div id="mpBtns2" style="display:flex;margin-top:10px"><button class="mpb bad" id="mpBack1" style="flex:1">Back</button></div>
     </div>
     <div id="mpStageRoom" style="display:none">
-      <div class="mpHint">INVITE LINK — click the room code to copy and send it</div><div id="mpCode">----</div>
+      <div class="mpHint">PRIVATE CO-OP ROOM</div>
+      <div id="mpInviteState">Your room is ready. Share an invite link with friends to bring them straight into this lobby.</div>
+      <div id="mpInviteBtns"><button class="mpb go" id="mpCopyInvite">Copy invite link</button><button class="mpb" id="mpShareInvite">Share invite…</button></div>
       <div id="mpRoster"></div>
       <label>Your sorcerer</label><div id="mpChars"></div>
       <label>Mode <span id="mpModeNote" style="opacity:.6;text-transform:none;letter-spacing:0"></span></label><div id="mpModes"></div>
@@ -10042,7 +10167,7 @@ const CNMP=(function(){
   }
   function inviteLink(){
     const hostId=(cnHostPeer&&cnHostPeer.id)||getInvitePeer();if(!hostId||!S.room)return "";
-    try{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("room",S.room);u.searchParams.set("cnpeer",hostId);return u.toString();}catch(_){return location.href;}
+    try{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("cnpeer",hostId);return u.toString();}catch(_){return location.origin+location.pathname+"?cnpeer="+encodeURIComponent(hostId);}
   }
   function defaultServer(){return "";}
   async function connect(then,create,roomCode){
@@ -10068,10 +10193,11 @@ const CNMP=(function(){
       // Explicit secure signalling + TURN fallback for networks where STUN alone fails.
       peer=new PeerCtor(undefined,{
         host:"0.peerjs.com",port:443,path:"/",secure:true,debug:0,
+        // Use currently supported public STUN discovery. The old PeerJS-hosted
+        // TURN credentials were discontinued, so keep obsolete TURN entries out.
         config:{iceServers:[
           {urls:"stun:stun.l.google.com:19302"},
-          {urls:"turn:eu-0.turn.peerjs.com:3478",username:"peerjs",credential:"peerjsp"},
-          {urls:"turn:us-0.turn.peerjs.com:3478",username:"peerjs",credential:"peerjsp"}
+          {urls:"stun:stun1.l.google.com:19302"}
         ],sdpSemantics:"unified-plan"}
       });
     }catch(e){setJoinBusy(false);status("Your browser could not start WebRTC. Try an up-to-date Chrome, Edge, Firefox or Safari browser.");return;}
@@ -10088,6 +10214,7 @@ const CNMP=(function(){
       if(failed||opened||S.ws!==ws)return;
       failed=true;clearTimers();
       setJoinBusy(false);status(message);S.conn=false;ws.readyState=3;
+      const retry=$("mpJoin");if(retry&&getInvitePeer()){retry.style.display="";retry.textContent="Retry connection";}
       if(S.ws===ws)S.ws=null;
       if(cnHostPeer===peer)cnHostPeer=null;
       if(cnClientPeer===peer)cnClientPeer=null;
@@ -10095,10 +10222,10 @@ const CNMP=(function(){
     }
     function errorText(err){
       const type=err&&err.type||"";
-      if(type==="peer-unavailable")return "The host couldn't be reached. Make sure their room is still open, then ask them to create a fresh invite link.";
+      if(type==="peer-unavailable")return "Invite host not found. The host may have closed or refreshed their tab; ask them to create a new room and share a fresh link.";
       if(type==="browser-incompatible")return "This browser doesn't support the WebRTC features Cursed Night needs. Try an up-to-date Chrome, Edge, Firefox or Safari.";
       if(["network","socket-error","socket-closed","server-error"].includes(type))return "The multiplayer signalling service could not be reached. Check Wi-Fi, VPN/content blockers, or try another network.";
-      if(type==="webrtc")return "Your network blocked the direct player connection. Try another network; some school, work and mobile networks restrict peer-to-peer traffic.";
+      if(type==="webrtc")return "Your network blocked the direct player connection. Cursed Night currently uses browser-to-browser networking, so try another network if this one blocks WebRTC.";
       return "Multiplayer couldn't connect ("+(type||"network error")+"). Check your connection and try again.";
     }
     ws.onopen=()=>{opened=true;clearTimers();S.conn=true;status("");then&&then();};
@@ -10106,14 +10233,15 @@ const CNMP=(function(){
     ws.onerror=()=>{};
     ws.onclose=()=>{
       clearTimers();const was=S.conn;S.conn=false;if(S.ws!==ws)return;
-      if(!opened){setJoinBusy(false);status("Connection closed before the room opened. Check your network and retry.");return;}
+      ws.readyState=3;S.ws=null;
+      if(!opened){setJoinBusy(false);status("Connection closed before the room opened. Check your network and tap Retry connection.");return;}
       if(S.inRun){S.active=false;clearAllies();hideTeam();toast("Disconnected from the host — continuing solo",5000);if(S.down||S.dead)reviveSelf(.5);}
-      else if(was&&!S.wantLeave){showStage("conn");status("Disconnected from the room. Ask the host to create a new invite if it closed.");}
+      else if(was&&!S.wantLeave){showStage("conn");status("Disconnected from the room. Ask the host to create a fresh invite, then retry.");const retry=$("mpJoin");if(retry&&getInvitePeer()){retry.style.display="";retry.textContent="Retry connection";}}
     };
     // Phase 1: PeerJS assigns an ID via its signalling server.
     peerTimer=setTimeout(()=>{
-      if(!peerReady)failBeforeOpen("Still couldn't reach the multiplayer service after 15 seconds. Check your connection/VPN or try another network, then retry.");
-    },15000);
+      if(!peerReady)failBeforeOpen("The multiplayer signalling service did not answer in 25 seconds. Check your connection or content blocker, then tap Retry connection.");
+    },25000);
     peer.on("open",()=>{
       if(S.ws!==ws||failed)return;
       peerReady=true;clearTimeout(peerTimer);peerTimer=0;
@@ -10133,7 +10261,7 @@ const CNMP=(function(){
         conn.on("open",()=>{if(S.ws!==ws||failed)return;clearTimeout(dataTimer);dataTimer=0;ws.readyState=1;if(ws.onopen)ws.onopen();});
         conn.on("data",data=>{if(S.ws!==ws||!ws.onmessage)return;ws.onmessage({data:typeof data==="string"?data:JSON.stringify(data)});});
         conn.on("close",()=>{if(ws.readyState===3)return;ws.readyState=3;if(ws.onclose)ws.onclose();});
-        conn.on("error",err=>{if(!opened)failBeforeOpen(errorText(err));else status("The connection was interrupted. Ask the host to create a fresh invite if it doesn't recover.");});
+        conn.on("error",err=>{if(!opened)failBeforeOpen(errorText(err));else {setJoinBusy(false);const retry=$("mpJoin");if(retry&&getInvitePeer()){retry.style.display="";retry.textContent="Retry connection";}status("The connection was interrupted. Check that the host is still in the lobby, then retry the invite.");}});
       }
     });
     peer.on("error",err=>{
@@ -10154,7 +10282,7 @@ const CNMP=(function(){
       case "joined":
         setJoinBusy(false);S.id=m.id;S.room=m.room;setRoster(m);showStage("room");status("");
         SS("cn_mp_auto",JSON.stringify({room:m.room,name:S.name,peer:getInvitePeer()}));
-        if(getInvitePeer())history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname+"?room="+m.room+"&cnpeer="+encodeURIComponent(getInvitePeer()));
+        if(getInvitePeer())history.replaceState&&/^https?:/.test(location.protocol)&&history.replaceState(null,"",location.pathname+"?cnpeer="+encodeURIComponent(getInvitePeer()));
         break;
       case "roster":{
         const before=new Set(S.roster.map(r=>r.id));
@@ -10183,9 +10311,13 @@ const CNMP=(function(){
   function openLobby(){
     $("mpName").value=LS("cn_mp_name")||"";
     $("mpServer").value="";
-    const q=getQueryRoom();
-    if(q&&!$("mpRoomIn").value)$("mpRoomIn").value=q;
-    if(getInvitePeer()){$("mpCreate").style.display="none";$ ("mpJoin").textContent="Join invite";}else{$("mpCreate").style.display="";$("mpJoin").textContent="Join room";}
+    const invited=!!getInvitePeer();
+    $("mpCreate").style.display=invited?"none":"";
+    $("mpJoin").style.display=invited?"":"none";
+    $("mpJoin").textContent=invited?"Retry connection":"Join invite";
+    $("mpConnectHint").textContent=invited
+      ?"Invite detected. Cursed Night is connecting automatically. If it fails, check that your friend is still hosting and use Retry connection."
+      :"Create a private room, then share one invite link. Friends who open your invite will connect automatically. Keep your game tab open while they join.";
     lobby.classList.add("open");$("safeHome").style.display="none";
     if(!S.room)showStage("conn");else showStage("room");
   }
@@ -10193,7 +10325,11 @@ const CNMP=(function(){
   function myProfile(){return S.roster.find(r=>r.id===S.id);}
   function renderRoom(){
     if(!S.room)return;
-    $("mpCode").textContent=S.room;
+    const inviteReady=!!inviteLink();
+    $("mpInviteState").textContent=inviteReady
+      ?"ROOM READY · Copy or share the invite link. Keep this tab open while hosting."
+      :"Connecting your room to the invite service…";
+    $("mpCopyInvite").disabled=!inviteReady;$("mpShareInvite").disabled=!inviteReady;
     const R=$("mpRoster");R.innerHTML="";
     for(const r of S.roster){
       const d=document.createElement("div");d.className="mpR"+(r.id===S.id?" me":"");
@@ -10222,28 +10358,35 @@ const CNMP=(function(){
     else{st.textContent="Waiting for host…";st.classList.add("dim");}
   }
   function doJoin(create){
+    if(S.conn||S.ws){status("A multiplayer connection is already active. Please wait or leave the current room first.");return;}
     const name=($("mpName").value||"").trim().slice(0,16)||"Sorcerer";
     S.name=name;LS("cn_mp_name",name);
-    let code=($("mpRoomIn").value||"").trim().toUpperCase();
     const invitedPeer=getInvitePeer();
-    if(create)code=makeRoomCode();
-    else if(invitedPeer)code=getQueryRoom()||code;
-    if(!create&&(!invitedPeer||code.length<3)){status("Use the invite link your friend copied from their room.");return;}
-    S.wantLeave=false;
-    setJoinBusy(true);
+    // The active host browser has one room, so invite links only need its peer ID.
+    // The actual room token remains internal and is never displayed or copied.
+    let code=create?makeRoomCode():getQueryRoom();
+    if(!create&&!invitedPeer){status("Open your friend's invite link to join automatically. There is no room-code entry.");return;}
+    S.wantLeave=false;setJoinBusy(true);
+    status(create?"Starting private room…":"Connecting to your friend's room…");
     connect(()=>{send({t:"join",name,char:CHAR,room:code,create:!!create,rejoin:false});S.rejoin=false;},!!create,code);
   }
   $("mpCreate").onclick=()=>doJoin(true);
   $("mpJoin").onclick=()=>doJoin(false);
-  $("mpRoomIn").addEventListener("keydown",e=>{if(e.key==="Enter")doJoin(false);});
   $("mpBack1").onclick=()=>{closeLobby();$("safeHome").style.display="flex";};
   $("mpLeave").onclick=leaveRoom;
   $("mpStart").onclick=()=>{if(S.started)beginRun();else if(S.host===S.id)send({t:"start"});};
-  $("mpCode").onclick=()=>{
+  function copyInviteLink(){
     const link=inviteLink();
-    if(!link){status("Invite link is not ready yet. Create a room first.");return;}
-    const done=()=>status("Invite link copied! Send it to friends and keep this tab open and visible.");
-    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done).catch(()=>window.prompt("Copy this invite link and send it to friends:",link));else window.prompt("Copy this invite link and send it to friends:",link);}catch(_){window.prompt("Copy this invite link and send it to friends:",link);}
+    if(!link){status("The invite link is not ready yet. Wait until your room is connected.");return;}
+    const copied=()=>status("Invite link copied. Send it to your friends and keep this hosting tab open.");
+    const fallback=()=>{try{window.prompt("Copy this invite link and send it to friends:",link);}catch(_){};};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(copied).catch(fallback);else fallback();}catch(_){fallback();}
+  }
+  $("mpCopyInvite").onclick=copyInviteLink;
+  $("mpShareInvite").onclick=()=>{
+    const link=inviteLink();if(!link){status("The invite link is not ready yet. Wait until your room is connected.");return;}
+    if(navigator.share){navigator.share({title:"Cursed Night Co-op",text:"Join my Cursed Night run!",url:link}).then(()=>status("Invite ready to share.")).catch(()=>{});}
+    else copyInviteLink();
   };
   function leaveRoom(){
     setJoinBusy(false);S.wantLeave=true;SS("cn_mp_auto",null);
@@ -10267,7 +10410,26 @@ const CNMP=(function(){
     if(e.key==="Escape"&&lobby.classList.contains("open")&&!S.inRun){e.preventDefault();e.stopPropagation();
       if(S.room)status("Use LEAVE to exit the room.");else{closeLobby();$("safeHome").style.display="flex";}}
   },true);
-  for(const el of [$("mpName"),$("mpServer"),$("mpRoomIn"),chatIn])for(const ev of["keydown","keyup"])el.addEventListener(ev,e=>e.stopPropagation());
+  for(const el of [$("mpName"),$("mpServer"),chatIn])for(const ev of["keydown","keyup"])el.addEventListener(ev,e=>e.stopPropagation());
+
+  // Invite links are one-click: open the lobby and automatically start joining.
+  // A visible retry remains available if the host tab is offline or the network blocks WebRTC.
+  if(getInvitePeer()){
+    setTimeout(()=>{
+      try{
+        // Some browsers restore a page from BFCache and fire setup hooks again.
+        // Only start one outbound connection for an invite URL.
+        if(S.room||S.conn||S.ws)return;
+        openLobby();
+        status("Invite link detected · contacting the host…");
+        doJoin(false);
+      }catch(err){
+        console.error("Cursed Night invite startup failed",err);
+        setJoinBusy(false);
+        status("Couldn't start the invite connection. Check the link and use Retry connection.");
+      }
+    },400);
+  }
 
   /* ------------------------------------------------------------ run */
   function beginRun(){
@@ -10479,7 +10641,7 @@ const CNMP=(function(){
       const dn=(a.f&48)||now-a.seen>STALE;
       rows.push(`<div class="tr${dn?" dn":""}"><div class="t1"><span style="color:${esc(a.col)}">${esc(chIc(a.char))} ${esc(a.name)}</span><i>${a.f&128?"⏸ ":""}S${a.st+1} · LV ${a.lv} · ${a.k}</i></div><div class="bar"><b style="width:${hpP(a.hp,a.mh)}%"></b></div></div>`);
     });
-    rows.push(`<div class="meta">room ${esc(S.room||"")} · ${S.ping}ms</div>`);
+    rows.push(`<div class="meta">CO-OP LINK · ${Math.max(0,Number(S.ping)||0)}ms</div>`);
     team.innerHTML=rows.join("");
   }
 
@@ -10507,18 +10669,7 @@ const CNMP=(function(){
   const _svic=showVictory;showVictory=function(){const r=_svic.apply(this,arguments);endHook();return r;};
   const _hit=hitPlayer;hitPlayer=function(){if(S.active&&(S.down||S.dead))return 0;return _hit.apply(this,arguments);};
 
-  // Invite-link flow: friends land straight in the co-op lobby and connect.
-  // A host is the temporary relay, so the host tab must remain open.
-  setTimeout(()=>{
-    if(getInvitePeer()){
-      SS("cn_mp_auto",null);openLobby();
-      const room=getQueryRoom();if(room)$("mpRoomIn").value=room;
-      const savedName=LS("cn_mp_name");$("mpName").value=savedName||"Sorcerer";
-      doJoin(false);return;
-    }
-    const raw=SS("cn_mp_auto");
-    if(raw){SS("cn_mp_auto",null);}
-  },650);
+  // v15: auto-join is handled exactly once by the guarded 250ms invite handler above.
 
   return {S,onDeath,frozen,sim,drawAllies,openLobby,beginRun,send,relay,onRelay,tick};
 })();

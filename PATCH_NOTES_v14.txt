@@ -1,0 +1,27 @@
+CURSED NIGHT v14 — LINK-FIRST CO-OP + GRAPHICS OVERHAUL
+
+MULTIPLAYER
+- Removed the visible room-code field and visible room code from the lobby.
+- Invite links contain only the host peer ID; the room token is kept internal.
+- Friends opening a valid invite link automatically open the co-op lobby and start connecting.
+- Added Copy Invite Link and Share Invite buttons.
+- Added a retry path and more explicit connection messages.
+- Removed legacy PeerJS TURN entries that depended on discontinued free TURN service credentials; standard STUN discovery remains.
+- Browser-only peer-to-peer connection still requires the host tab to stay open. Some restrictive networks may block direct WebRTC connections.
+
+MENU / RESPONSIVE DESIGN
+- Redesigned the title menu with a glass-panel layout, cleaner typography, clearer hierarchy, improved cards and more useful spacing.
+- Responsive layout improvements for phones, tablets, small laptop windows and short landscape screens.
+- Improved co-op lobby styling and touch-target sizes.
+
+GRAPHICS / PERFORMANCE
+- Expanded the Graphics & Performance section with toggles for enemy auras, player aura, projectile glow/trails, ground shadows, hit particles, impact flashes, damage vignette, dash streaks, stage tint, fog and FPS counter, alongside existing lens flares/bloom/motes/grain/scanlines/HUD skin settings.
+- Wired toggles into their corresponding rendering paths instead of leaving them decorative.
+- Implemented the Frame Rate Limit selection in the main loop.
+- Persists base quality settings locally and applies them at startup.
+- Respects prefers-reduced-motion preference for effect quality.
+
+TESTING
+- JavaScript syntax checked with Node.js.
+- ZIP integrity checked after packaging.
+- Live internet multiplayer between separate networks has not been end-to-end verified in this environment.

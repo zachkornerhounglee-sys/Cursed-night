@@ -1,0 +1,20 @@
+CURSED NIGHT v15 — CO-OP LINK FIX + GRAPHICS POLISH
+
+MULTIPLAYER FIXES
+- Removed the duplicate legacy invite auto-join timer. A guest now initiates only one PeerJS connection from a link.
+- Added guards against duplicate invite opens and parallel connection attempts.
+- Removed visible room tokens from the gameplay team HUD; invite links use only the host peer ID.
+- Improved mobile-friendly connection timeouts and retry feedback.
+- Kept room IDs internal to the host-side relay; players do not need to type or share a room code.
+
+MENU / GRAPHICS
+- Retains the polished responsive title menu and expanded Graphics & Performance panel from v14.
+- Includes base quality presets, frame-rate cap, particle intensity, screen shake, and toggles for bloom, lens flares, fog, player/enemy auras, projectile glow/trails, shadows, hit particles, impact flash, damage vignette, dash streaks, stage tint, chromatic distortion, film grain, scanlines, HUD skin, and FPS display.
+
+LIMITATIONS
+- The host must keep the game tab open while hosting.
+- PeerJS handles signalling and WebRTC attempts direct browser-to-browser traffic. Some networks require a TURN relay, so connections can still fail on restrictive networks without a relay service.
+
+TESTING
+- JavaScript syntax and ZIP integrity are checked at package time.
+- A live multiplayer session between separate networks has not been end-to-end verified here.

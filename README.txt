@@ -32,3 +32,20 @@ IMPORTANT LIMITATIONS
 - This is not a dedicated server; rooms are temporary, support up to four players, and stop when the host leaves/closes the page.
 - The app cannot guarantee perfectly smooth performance on every device. It now scales the viewport and reduces expensive effects when a device reports low resources or frame rate.
 - server.js, package.json and render.yaml are retained from the prior standalone-server build but are not required by share-link mode.
+
+
+V14 CO-OP INVITE NOTES
+1. Host opens the GitHub Pages game and chooses CO-OP MULTIPLAYER.
+2. Host creates a private room, then uses Copy invite link (or Share invite).
+3. Friend opens the link. The co-op lobby attempts to join automatically; no room code is entered.
+4. Keep the host tab open while the room is in use.
+5. This mode uses PeerJS signalling plus browser-to-browser WebRTC; it does not require Render, but a restrictive network may prevent the direct connection.
+6. If an invite fails, ask the host to create a fresh room and resend the new invite link.
+
+
+V15 INVITE-LINK FIX
+- Host: open the game, choose CO-OP MULTIPLAYER, and click Create private room.
+- After the lobby opens, choose Copy invite link or Share invite. No room code is shown or needed.
+- Friend: open the link in a current browser. It auto-connects; if connection fails, a Retry connection button appears.
+- Keep the host game tab open. Direct WebRTC can still be blocked by restrictive Wi-Fi/network settings.
+- If GitHub Pages is your host, upload the new index.html to the repository root (and game.html if you use it), then commit changes.
