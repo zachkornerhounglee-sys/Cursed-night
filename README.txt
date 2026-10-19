@@ -1,3 +1,21 @@
+CURSED NIGHT v16 — CO-OP FIX
+============================
+Multiplayer was crashing on load (missing send/relay functions). Fixed in v16 — see PATCH_NOTES_v16.txt.
+
+UPDATE YOUR GITHUB PAGES SITE
+1. Extract this ZIP. Open the CursedNight_v16 folder.
+2. In your repo click Add file > Upload files and drag in index.html and game.html
+   (plus README.txt / PATCH_NOTES_v16.txt if you like). Do NOT drag the outer folder.
+3. Commit to main, wait ~1 minute, then hard-refresh (Ctrl+Shift+R) or use a private window.
+
+PLAY WITH FRIENDS
+1. Host: open your GitHub Pages link > CO-OP MULTIPLAYER > Create room > Copy invite link.
+2. Friends open that link; they connect automatically. Host presses Start run.
+3. The host's tab must stay open (and visible) while playing.
+
+IF A FRIEND CAN'T CONNECT: some networks (school, work, some mobile data) block direct browser-to-browser
+traffic. Try another network/hotspot, or add your own free TURN server (see PATCH_NOTES_v16.txt).
+
 CURSED NIGHT — SHARE-LINK CO-OP BUILD v13
 ========================================
 

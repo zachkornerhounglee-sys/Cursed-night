@@ -1,0 +1,21 @@
+CURSED NIGHT v16 — CO-OP FIX
+
+ROOT CAUSE OF "MULTIPLAYER DOESN'T WORK"
+- In v14/v15 the networking rewrite deleted the two helper functions every co-op message goes through
+  (send and relay). The whole co-op module crashed while loading, so Create room / invite links / ghosts /
+  chat / revive all did nothing. Both functions are restored.
+
+OTHER FIXES
+- The host's PeerJS signalling connection now auto-reconnects. Before, one network blip left the hosting tab
+  unable to accept NEW friends (they got "host not found") until the host refreshed. A reconnect no longer
+  rebuilds the room either.
+- Added a free public TURN relay (best effort) alongside STUN so more school/work/mobile networks can connect.
+  For a reliable relay, make a free account at metered.ca and paste your entries into CNMP_TURN
+  (search "CNMP_TURN" in index.html).
+
+TESTING (automated, jsdom)
+- 4-player room using the game's real co-op code against a simulated PeerJS network: invite-link join,
+  roles, character sync, run start, ghosts incl. guest-to-guest, shared bullets damaging enemies, chat,
+  down/revive, full-room rejection, host-leaves, signalling-drop recovery, offline-host / blocked-signalling /
+  blocked-WebRTC error messages. 0 script errors.
+- NOT tested: real WebRTC between real computers/networks (the environment has no internet).

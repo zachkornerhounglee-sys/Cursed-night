@@ -10085,6 +10085,9 @@ const CNMP=(function(){
   function cleanRoomName(n){return String(n==null?"":n).replace(/[\u0000-\u001f\u007f<>]/g,"").trim().slice(0,16)||"Player";}
   function cleanRoomCode(c){c=String(c==null?"":c).toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);return c.length>=3?c:"";}
   function peerLibrary(){return window.Peer||window.PeerJS||null;}
+  // Outgoing messages: every co-op message goes through S.ws (a PeerJS-backed socket shim).
+  function send(o){if(S.ws&&S.ws.readyState===1){try{S.ws.send(JSON.stringify(o));}catch(_){}}}
+  function relay(d,to){const m={t:"r",d};if(to!=null)m.to=to;send(m);}
   function serverSend(sock,obj){
     if(!sock||sock.closed)return;
     try{
@@ -10170,6 +10173,19 @@ const CNMP=(function(){
     try{const u=new URL(location.href);u.search="";u.hash="";u.searchParams.set("cnpeer",hostId);return u.toString();}catch(_){return location.origin+location.pathname+"?cnpeer="+encodeURIComponent(hostId);}
   }
   function defaultServer(){return "";}
+  // Connection servers. STUN finds a direct path; TURN relays traffic when a network (school, work, mobile data)
+  // blocks direct connections. The Open Relay entries are a free public best-effort TURN; to be sure for your
+  // friends, make a free account at metered.ca (or Cloudflare Calls) and paste your own entries into CNMP_TURN, e.g.
+  //   {urls:"turn:global.relay.metered.ca:443?transport=tcp",username:"YOUR_USER",credential:"YOUR_KEY"}
+  const CNMP_TURN=[];
+  function cnIceServers(){
+    const list=[
+      {urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"},{urls:"stun:stun.cloudflare.com:3478"},
+      {urls:["turn:openrelay.metered.ca:80","turn:openrelay.metered.ca:443","turn:openrelay.metered.ca:443?transport=tcp","turns:openrelay.metered.ca:443?transport=tcp"],username:"openrelayproject",credential:"openrelayproject"}
+    ];
+    for(const t of CNMP_TURN)list.push(t);
+    return list;
+  }
   async function connect(then,create,roomCode){
     // Wait for either CDN copy of PeerJS, but never hang forever.
     let PeerCtor=peerLibrary();
@@ -10195,10 +10211,7 @@ const CNMP=(function(){
         host:"0.peerjs.com",port:443,path:"/",secure:true,debug:0,
         // Use currently supported public STUN discovery. The old PeerJS-hosted
         // TURN credentials were discontinued, so keep obsolete TURN entries out.
-        config:{iceServers:[
-          {urls:"stun:stun.l.google.com:19302"},
-          {urls:"stun:stun1.l.google.com:19302"}
-        ],sdpSemantics:"unified-plan"}
+        config:{iceServers:cnIceServers(),sdpSemantics:"unified-plan"}
       });
     }catch(e){setJoinBusy(false);status("Your browser could not start WebRTC. Try an up-to-date Chrome, Edge, Firefox or Safari browser.");return;}
     if(create)cnHostPeer=peer;else cnClientPeer=peer;
@@ -10244,6 +10257,7 @@ const CNMP=(function(){
     },25000);
     peer.on("open",()=>{
       if(S.ws!==ws||failed)return;
+      if(peerReady){if(opened)status("Room service reconnected — you can invite friends again.");return;}
       peerReady=true;clearTimeout(peerTimer);peerTimer=0;
       if(create){
         cnRelayRoom=null;cnHostRoomCode=roomCode||makeRoomCode();
@@ -10269,9 +10283,20 @@ const CNMP=(function(){
       if(!opened)failBeforeOpen(errorText(err));
       else if(["network","socket-error","socket-closed","server-error"].includes(err&&err.type))status("The signalling service disconnected. Existing room traffic may stop; reconnect if needed.");
     });
+    let reconnTimer=0,reconnTries=0;
+    const reconnectSignalling=()=>{
+      clearTimeout(reconnTimer);
+      if(peer.destroyed||S.ws!==ws||ws.readyState===3)return;
+      if(!peer.disconnected){reconnTries=0;return;}
+      try{peer.reconnect();}catch(_){}
+      reconnTries++;
+      reconnTimer=setTimeout(reconnectSignalling,Math.min(15000,2000*reconnTries));
+    };
     peer.on("disconnected",()=>{
-      // PeerJS can reconnect to its broker without killing an already-open WebRTC link.
-      if(S.ws===ws&&opened)status("Signalling service reconnected; keeping the current player link if it is still active…");
+      // Without reconnect() a hosting tab silently stops accepting NEW friends after a network blip.
+      if(S.ws!==ws||!peerReady)return;
+      if(opened)status("Lost the room service — reconnecting…");
+      reconnTries=0;reconnectSignalling();
     });
     peer.on("close",()=>{
       if(S.ws===ws&&!opened&&!failed)failBeforeOpen("The multiplayer connection closed before it was ready. Please try again.");
