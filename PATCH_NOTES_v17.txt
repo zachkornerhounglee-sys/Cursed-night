@@ -1,0 +1,27 @@
+CURSED NIGHT v17
+
+LOOK
+- Built on v8. The graphics overhaul added in v10 (glow lighting, bloom, grain, fog, motes, enemy auras) and the
+  v14 title/menu/canvas restyle are NOT included, so visuals and menus match v8 again.
+- Every original v8 line is untouched except 3 hook lines for co-op and the page title.
+
+CO-OP (fixes from v16 carried over)
+- Restored the missing send/relay functions that crashed co-op on load in v14/v15.
+- Host auto-reconnects to the PeerJS room service; best-effort public TURN added (own TURN: search CNMP_TURN).
+
+HOST / PERFORMANCE
+- Errors on the host's own client were silently swallowed (host could be left on a dead screen). They now show a
+  message, and a failed start returns to the lobby instead of a blank screen.
+- Lobby overlay can no longer stay on top of a running game.
+- Host relay serialises each message once instead of once per player; guests are rate-limited and oversize
+  messages dropped.
+- One combined network message per tick (position + shots); nothing sent while alone in the room; slow keep-alive
+  when idle. Measured on a simulated 3-player room: moving + shooting 85 -> 45 messages/s, 6 -> 4 KB/s;
+  standing still 88 -> 18 messages/s.
+- Network timer runs in a Worker so a host whose tab is in the background keeps relaying at full rate.
+  (The game itself still pauses in a hidden tab — keep it visible.)
+
+TESTING
+- jsdom + a REAL canvas (node-canvas): 4-player room, invite join, character sync, ghosts, shared shots, chat,
+  down/revive, full room, host leaves, signalling drop, start failure, error messages. 0 script errors.
+- Not tested: real WebRTC across real networks (no internet in the build environment).
